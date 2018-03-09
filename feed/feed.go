@@ -2,6 +2,9 @@ package feed
 
 import (
 	"fmt"
+	"sync"
+
+	"github.com/yujiahaol68/rossy/logger"
 )
 
 // post implement Feed interface and hide the detail to customer
@@ -33,7 +36,21 @@ type Source struct {
 	ETag         string
 	LastModified string
 	Alias        string
+	Type         string
 }
+
+// SourceController will response to the costumer like CMD etc
+type SourceController interface {
+	AddNewSource(url ...string) ([]Source, error)
+	SaveSource() error
+}
+
+type CmdController struct{}
+
+var (
+	wg    sync.WaitGroup
+	mutex sync.Mutex
+)
 
 func (p post) GetName() string {
 	return p.title
@@ -61,4 +78,33 @@ func (p post) String() string {
 
 func (p post) Display() {
 	fmt.Println(p)
+}
+
+// AddNewSource bind with CMD: rossy add [url] [url] ...
+func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string) ([]*Source, error) {
+	wg.Add(len(urls))
+	s := make([]*Source, 0)
+
+	for _, u := range urls {
+		go func(url string) {
+			defer wg.Done()
+
+			source, err := getSourceByURL(url)
+			if err != nil {
+				tunnel <- logger.NewErrMsg(err)
+				return
+			}
+
+			source.URL = url
+
+			mutex.Lock()
+			{
+				s = append(s, source)
+			}
+			mutex.Unlock()
+		}(u)
+	}
+
+	wg.Wait()
+	return s, nil
 }

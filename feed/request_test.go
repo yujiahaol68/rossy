@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	stdRSSurl = "https://news.microsoft.com/feed/"
+	stdRSSurl  = "https://news.microsoft.com/feed/"
+	atomURL    = ""
+	notFeedurl = "https://bing.com"
 )
 
 func Test_Headers(t *testing.T) {
@@ -65,6 +67,30 @@ func Test_conditionalGET(t *testing.T) {
 	}
 
 	fmt.Printf("Original GET size: %d\nConditional GET size: %d\n", beforeDataSize, len(newRawBody))
+}
+
+func Test_sourceByURL(t *testing.T) {
+	s, err := getSourceByURL(stdRSSurl)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if s.Type != "rss" {
+		t.Fatalf("expect RSS type feed, but got %v", s.Type)
+	}
+
+	fmt.Printf("Alias: %s\nType: %s\nEtag: %s\nLast-modified:%s\n", s.Alias, s.Type, s.ETag, s.LastModified)
+
+	// s, err = getSourceByURL(atomURL)
+
+	// if s.Type != "atom" {
+
+	// }
+
+	_, err = getSourceByURL(notFeedurl)
+	if err != ErrInvalidSource {
+		t.Fatal(err)
+	}
 }
 
 func Test_lookup(t *testing.T) {

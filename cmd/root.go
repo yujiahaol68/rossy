@@ -21,9 +21,13 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/yujiahaol68/rossy/logger"
 )
 
-var cfgFile string
+var (
+	cfgFile   string
+	msgTunnel chan *logger.Message
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
