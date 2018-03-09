@@ -1,0 +1,10 @@
+language: go
+
+before_install:
+- go get github.com/mitchellh/gox
+- go get github.com/inconshreveable/mousetrap
+
+script:
+- go get -t -v ./...
+- go test -v -race ./...
+- gox -os="linux darwin windows" -arch="amd64" -output="rossy.{{.OS}}.{{.Arch}}" -verbose ./...
