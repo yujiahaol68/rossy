@@ -1,10 +1,18 @@
 language: go
+os:
+  - linux
+  - osx
+go:
+  - 1.10
+  - 1.9
 
 before_install:
 - go get github.com/mitchellh/gox
 - go get github.com/inconshreveable/mousetrap
+- go get github.com/mattn/goveralls
 
 script:
 - go get -t -v ./...
 - go test -v -race ./...
+- $GOPATH/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
 - gox -os="linux darwin windows" -arch="amd64" -output="rossy.{{.OS}}.{{.Arch}}" -verbose ./...
