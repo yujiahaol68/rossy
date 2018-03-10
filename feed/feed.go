@@ -83,6 +83,7 @@ func (p post) Display() {
 // AddNewSource bind with CMD: rossy add [url] [url] ...
 func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string) ([]*Source, error) {
 	wg.Add(len(urls))
+	defer close(tunnel)
 	s := make([]*Source, 0)
 
 	for _, u := range urls {

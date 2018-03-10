@@ -1,14 +1,18 @@
 package feed
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 
 	"github.com/yujiahaol68/rossy/atom"
 	"github.com/yujiahaol68/rossy/rss"
+	"golang.org/x/net/html/charset"
 )
 
 const (
@@ -54,43 +58,65 @@ func getSourceDesc(rsp *http.Response, feedType string) (*Source, error) {
 		return nil, CmdErrXMLParse
 	}
 
+	d := xml.NewDecoder(bytes.NewReader(bodyContent))
+	d.CharsetReader = func(s string, reader io.Reader) (io.Reader, error) {
+		return charset.NewReader(reader, s)
+	}
+
+	s := new(Source)
+	s.LastModified = rsp.Header.Get("last-modified")
+	s.ETag = rsp.Header.Get("etag")
+	s.Type = feedType
+
 	switch feedType {
 	case "rss":
 		r := rss.New()
+		err = d.Decode(r)
 
-		err = xml.Unmarshal(bodyContent, &r)
 		if err != nil {
 			return nil, CmdErrXMLParse
 		}
 
-		return &Source{
-			"",
-			rsp.Header.Get("last-modified"),
-			rsp.Header.Get("etag"),
-			r.Description,
-			feedType,
-		}, nil
+		s.Alias = r.Description
+		return s, nil
 
 	case "atom":
 		a := atom.New()
+		err = d.Decode(a)
 
-		err = xml.Unmarshal(bodyContent, &a)
 		if err != nil {
 			return nil, CmdErrXMLParse
 		}
 
-		return &Source{
-			"",
-			rsp.Header.Get("last-modified"),
-			rsp.Header.Get("etag"),
-			a.Title,
-			feedType,
-		}, nil
+		s.Alias = a.Title
+		return s, nil
 
-	//case "xml":
-	// TODO: header like Content-Type: text/xml; charset=utf-8 is unknown type
+	// case "xml":
 	default:
-		return nil, CmdNotSupportXML
+		rp := rss.New()
+		ap := atom.New()
+
+		if bytes.Contains(bodyContent, []byte("<feed")) {
+			err = d.Decode(&ap)
+			if err != nil {
+				log.Fatal(err)
+				return nil, CmdErrXMLParse
+			}
+
+			s.Alias = ap.Title
+			s.Type = "atom"
+			return s, nil
+		}
+
+		err = d.Decode(&rp)
+		if err != nil {
+			log.Fatal(err)
+			return nil, CmdErrXMLParse
+		}
+
+		s.Alias = rp.Description
+		s.Type = "rss"
+		return s, nil
 	}
 }
 

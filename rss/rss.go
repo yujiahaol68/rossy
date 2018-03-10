@@ -5,6 +5,7 @@ import (
 	"html/template"
 )
 
+// Rss Feed XML struct
 type Rss struct {
 	XMLName xml.Name `xml:"rss"`
 	Version string   `xml:"version,attr"`
@@ -17,6 +18,7 @@ type Rss struct {
 	ItemList []Item `xml:"channel>item"`
 }
 
+// Item is a sub struct in Rss
 type Item struct {
 	// Required
 	Title       string        `xml:"title"`
@@ -28,6 +30,7 @@ type Item struct {
 	Comments string        `xml:"comments"`
 }
 
+// New return Rss type pointer
 func New() *Rss {
 	r := Rss{}
 	return &r

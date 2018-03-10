@@ -1,11 +1,14 @@
 package rss_test
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/yujiahaol68/rossy/rss"
+	"golang.org/x/net/html/charset"
 )
 
 const (
@@ -34,37 +37,77 @@ const (
             <pubDate>Thu, 08 Mar 2018 08:55:36 GMT</pubDate>
             <media:thumbnail width="976" height="549" url="http://c.files.bbci.co.uk/FB10/production/_100327246_mediaitem100327245.jpg"/>
         </item>
-        <item>
-            <title><![CDATA[CCTV shows poisoned spy buying scratchcards]]></title>
-            <description><![CDATA[Footage has emerged of Sergei Skripal at a shop in Salisbury just five days before he collapsed.]]></description>
-            <link>http://www.bbc.co.uk/news/world-43323506</link>
-            <guid isPermaLink="true">http://www.bbc.co.uk/news/world-43323506</guid>
-            <pubDate>Wed, 07 Mar 2018 17:27:47 GMT</pubDate>
-            <media:thumbnail width="976" height="549" url="http://c.files.bbci.co.uk/A930/production/_100321334_p060dhbb.jpg"/>
-        </item>
-        <item>
-            <title><![CDATA[Florida shooting: Gun control law moves step closer]]></title>
-            <description><![CDATA[State lawmakers pass a bill that raises the legal age to buy a firearm from 18 to 21.]]></description>
-            <link>http://www.bbc.co.uk/news/world-us-canada-43325913</link>
-            <guid isPermaLink="true">http://www.bbc.co.uk/news/world-us-canada-43325913</guid>
-            <pubDate>Thu, 08 Mar 2018 07:36:07 GMT</pubDate>
-            <media:thumbnail width="976" height="549" url="http://c.files.bbci.co.uk/FCFA/production/_100326746_mediaitem100326745.jpg"/>
-        </item>
-        <item>
-            <title><![CDATA[Kim Wall death: Inventor Peter Madsen goes on trial]]></title>
-            <description><![CDATA[Peter Madsen faces charges of killing and dismembering Swedish journalist Kim Wall.]]></description>
-            <link>http://www.bbc.co.uk/news/world-europe-43325462</link>
-            <guid isPermaLink="true">http://www.bbc.co.uk/news/world-europe-43325462</guid>
-            <pubDate>Thu, 08 Mar 2018 02:26:33 GMT</pubDate>
-            <media:thumbnail width="976" height="549" url="http://c.files.bbci.co.uk/A9BB/production/_97315434_sub-composite.jpg"/>
-        </item>
     </channel>
 </rss>`
+
+	notUTF8rss = `<?xml version="1.0" encoding="gb2312"?>
+    <?xml-stylesheet type="text/xsl" href="/css/rss_xml_style.css"?>
+    <rss version="2.0">
+      <channel>
+        <title>新闻国内</title>
+        <image>
+          <title>新闻国内</title>
+          <link>http://news.qq.com</link>
+          <url>http://mat1.qq.com/news/rss/logo_news.gif</url>
+        </image>
+        <description>新闻国内</description>
+        <link>http://news.qq.com/china_index.shtml</link>
+        <copyright>Copyright 1998 - 2005 TENCENT Inc. All Rights Reserved</copyright>
+        <language>zh-cn</language>
+        <generator>www.qq.com</generator>
+        <item>
+          <title>国资委就“国有企业改革发展”相关问题答记者问</title>
+          <link>http://news.qq.com/a/20180310/018317.htm</link>
+          <author>www.qq.com</author>
+          <category/>
+          <pubDate>2018-03-10 14:14:11</pubDate>
+          <comments/>
+          <description>十三届全国人大一次会议新闻中心将于3月10日15时在梅地亚中心多功能厅举行记者会，邀请国务院国资委主任肖亚庆，副秘书长、新闻发言人彭华岗就“国有企业改革发展”相关问题回答中外记者提问。</description>
+        </item>
+        <item>
+          <title>外媒看两会：中国大胆迈向金融开放 货币政策保持定力</title>
+          <link>http://news.qq.com/a/20180310/018312.htm</link>
+          <author>www.qq.com</author>
+          <category/>
+          <pubDate>2018-03-10 14:14:00</pubDate>
+          <comments/>
+          <description>　　中新网3月10日电全国“两会”继续进行，3月9日上午，十三届全国人大一次会议新闻中心举行关于金融领域热点问题的记者会，外媒对此高度关注。外媒认为，中国进入稳杠杆和逐步调降杠杆阶段，金融监管体制改革呼之欲出；中国对外更“大胆地”开放金融市场的表态，也引起多家外媒关注。　　十三届全国人大一次会议新闻中心</description>
+        </item>
+        <item>
+          <title>田春艳代表：反思莫焕晶案，建全国联网家政服务人员信用平台</title>
+          <link>http://news.qq.com/a/20180310/016960.htm</link>
+          <author>www.qq.com</author>
+          <category/>
+          <pubDate>2018-03-10 12:56:34</pubDate>
+          <comments/>
+          <description>全国两会期间，来自北京代表团的全国人大代表田春艳向十三届全国人大一次会议提交了《关于建立全国联网的家政服务人员信用平台的建议》（下称“《建议》”）。建议中称，622杭州蓝色钱江小区保姆纵火案于2018年2月9日一审公开宣判，被告人莫焕晶被判死刑。此案出来后，社会上除了对受害者哀悼、惋惜、遗憾，对凶手的愤怒、</description>
+        </item>
+      </channel>
+    </rss>
+    `
 )
 
 func Test_parse(t *testing.T) {
 	r := rss.New()
 	err := xml.Unmarshal([]byte(rssContent), r)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, item := range r.ItemList {
+		fmt.Printf("* %s\n%s\n", item.Title, item.Link)
+	}
+}
+
+func Test_notUTF8(t *testing.T) {
+	r := rss.New()
+
+	d := xml.NewDecoder(bytes.NewReader([]byte(notUTF8rss)))
+	d.CharsetReader = func(s string, reader io.Reader) (io.Reader, error) {
+		return charset.NewReader(reader, s)
+	}
+	err := d.Decode(r)
+
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	stdRSSurl  = "https://news.microsoft.com/feed/"
-	atomURL    = ""
-	notFeedurl = "https://bing.com"
+	stdRSSurl          = "https://news.microsoft.com/feed/"
+	atomURL            = "http://www.ruanyifeng.com/blog/atom.xml"
+	notFeedurl         = "https://bing.com"
+	notUTF8encodingURL = "http://news.qq.com/newsgn/rss_newsgn.xml"
 )
 
 func Test_Headers(t *testing.T) {
@@ -81,16 +82,30 @@ func Test_sourceByURL(t *testing.T) {
 
 	fmt.Printf("Alias: %s\nType: %s\nEtag: %s\nLast-modified:%s\n", s.Alias, s.Type, s.ETag, s.LastModified)
 
-	// s, err = getSourceByURL(atomURL)
+	s, err = getSourceByURL(atomURL)
 
-	// if s.Type != "atom" {
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// }
+	if s.Type != "atom" {
+		t.Fatalf("expect atom feed type, but got %s", s.Type)
+	}
 
 	_, err = getSourceByURL(notFeedurl)
 	if err != ErrInvalidSource {
 		t.Fatal(err)
 	}
+}
+
+func Test_notUTF8(t *testing.T) {
+	s, err := getSourceByURL(atomURL)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(s.Alias)
 }
 
 func Test_lookup(t *testing.T) {
