@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -32,15 +33,17 @@ func NewErrMsg(e error) *Message {
 }
 
 // NewMsgGroup will log info msg to term. Args[0] is level and others are many msgs
-func NewMsgGroup(args ...string) []*Message {
-	s := make([]*Message, len(args)-1)
+func NewMsgGroup(args ...string) ([]*Message, error) {
 	if len(args) < 2 {
-		panic("Cmd Msg need at least 2 parameters")
+		//panic("Cmd Msg need at least 2 parameters")
+		return nil, errors.New("Cmd Msg need at least 2 parameters")
 	}
+	s := make([]*Message, len(args)-1)
+
 	level := args[0]
 
 	for i := 1; i < len(args); i++ {
 		s[i-1] = &Message{level, args[i]}
 	}
-	return s
+	return s, nil
 }
