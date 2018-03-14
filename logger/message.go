@@ -16,7 +16,12 @@ type Message struct {
 }
 
 func (m Message) ShowInCmd() {
-	fmt.Printf("%s: %s\n", m.Level, m.Msg)
+	if m.Level != "info" {
+		fmt.Printf("%s: %s\n", m.Level, m.Msg)
+		return
+	}
+
+	fmt.Println(m.Msg)
 }
 
 func NewErrMsg(e error) *Message {
@@ -26,13 +31,16 @@ func NewErrMsg(e error) *Message {
 	}
 }
 
-// func NewMsg(args []string, e error) *Message {
-// 	if e != nil {
-// 		defaultLevel := "ERROR"
+// NewMsgGroup will log info msg to term. Args[0] is level and others are many msgs
+func NewMsgGroup(args ...string) []*Message {
+	s := make([]*Message, len(args)-1)
+	if len(args) < 2 {
+		panic("Cmd Msg need at least 2 parameters")
+	}
+	level := args[0]
 
-// 		switch len(args) {
-// 		case 1:
-
-// 		}
-// 	}
-// }
+	for i := 1; i < len(args); i++ {
+		s[i-1] = &Message{level, args[i]}
+	}
+	return s
+}

@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"regexp"
 
@@ -36,7 +37,10 @@ var (
 func getSourceByURL(url string) (*Source, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, ErrUserNetwork
+		if err, ok := err.(net.Error); ok && err.Timeout() {
+			return nil, ErrUserNetwork
+		}
+		return nil, err
 	}
 
 	if feedType := sourceType(resp.Header.Get("content-type")); feedType != "" {

@@ -81,31 +81,32 @@ func (p post) Display() {
 }
 
 // AddNewSource bind with CMD: rossy add [url] [url] ...
-func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string) ([]*Source, error) {
-	wg.Add(len(urls))
+func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string) (s []*Source, reason error) {
 	defer close(tunnel)
-	s := make([]*Source, 0)
+	s = make([]*Source, len(urls))
+	// TODO: validate url before access network
 
-	for _, u := range urls {
-		go func(url string) {
+	wg.Add(len(urls))
+	for i, u := range urls {
+		go func(index int, url string) {
 			defer wg.Done()
 
 			source, err := getSourceByURL(url)
 			if err != nil {
+				if err == ErrUserNetwork {
+					reason = err
+				}
+
 				tunnel <- logger.NewErrMsg(err)
 				return
 			}
+			tunnel <- &logger.Message{Level: "info", Msg: fmt.Sprintf("Found %s feed: %s", source.Type, source.Alias)}
 
 			source.URL = url
-
-			mutex.Lock()
-			{
-				s = append(s, source)
-			}
-			mutex.Unlock()
-		}(u)
+			s[index] = source
+		}(i, u)
 	}
 
 	wg.Wait()
-	return s, nil
+	return
 }
