@@ -21,6 +21,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/yujiahaol68/rossy/feed"
+	"github.com/yujiahaol68/rossy/logger"
 )
 
 // addCmd represents the add command
@@ -37,6 +39,24 @@ var addCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
+
+		cc := new(feed.CmdController)
+		tunnel := make(chan *logger.Message)
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for m := range tunnel {
+				m.ShowInCmd()
+			}
+		}()
+
+		_, err := cc.AddNewSource(tunnel, args...)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		wg.Wait()
 	},
 }
 

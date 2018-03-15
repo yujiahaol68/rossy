@@ -16,7 +16,11 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
+	"sync"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -25,12 +29,13 @@ import (
 
 var (
 	cfgFile string
+	wg      sync.WaitGroup
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "rossy",
-	Short: "A CLI that can remind you to read your favorite post",
+	Short: "A CLI that can remind you to read your favorite feed",
 	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -73,6 +78,22 @@ func initConfig() {
 			os.Exit(1)
 		}
 
+		dataDir := filepath.Join(home, "rossy_data")
+		if _, e := os.Stat(dataDir); os.IsNotExist(e) {
+			err = os.Mkdir(dataDir, os.ModePerm)
+			if err != nil {
+				log.Fatalln(err)
+				fmt.Println("Permission deny when try to create rossy_data Dir under $HOME")
+				os.Exit(1)
+			}
+		}
+
+		defaultCfg := []byte(fmt.Sprintf("dataDir: %s", dataDir))
+		err = ioutil.WriteFile(filepath.Join(home, ".rossy.yaml"), defaultCfg, 0644)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 		// Search config in home directory with name ".rossy" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".rossy")
@@ -82,8 +103,8 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println("If this is the first time you use rossy. Please use  > rossy add <RSS_URL> to get start.")
 		fmt.Println("If you have .rossy.yaml config file. Please make sure it is under your $HOME dir or you need to specify its path by --config <PATH>")
+		fmt.Println("Config file name must be .rossy.yaml")
 		os.Exit(1)
 	}
 }
