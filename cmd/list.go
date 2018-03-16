@@ -16,6 +16,11 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"path/filepath"
+
+	"github.com/yujiahaol68/rossy/config"
+	"github.com/yujiahaol68/rossy/feed"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +31,15 @@ var listCmd = &cobra.Command{
 	Short: "List all rss feed source name",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("list called")
+		s, err := feed.ReadExistSource(filepath.Join(config.Get("dataDir"), "source.json"))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		fmt.Println("Exist feed source list below:")
+		for i, source := range s {
+			fmt.Printf("%d. %s\n- %s\n", i+1, source.Alias, source.URL)
+		}
 	},
 }
 

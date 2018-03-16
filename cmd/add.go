@@ -19,8 +19,10 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/yujiahaol68/rossy/config"
 	"github.com/yujiahaol68/rossy/feed"
 	"github.com/yujiahaol68/rossy/logger"
 )
@@ -51,12 +53,20 @@ var addCmd = &cobra.Command{
 			}
 		}()
 
-		_, err := cc.AddNewSource(tunnel, args...)
+		s, err := cc.AddNewSource(tunnel, args...)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		wg.Wait()
+
+		err = feed.SaveAsJSON(s, filepath.Join(config.Get("dataDir"), "source.json"))
+		if err != nil {
+			log.Fatalln(err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("\nNew feed source has saved successfully!\n")
 	},
 }
 

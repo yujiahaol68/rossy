@@ -14,6 +14,7 @@ type post struct {
 	desc     string
 	content  string
 	category string
+	pubDate  string
 }
 
 type category struct {
@@ -27,6 +28,7 @@ type Feed interface {
 	GetSource() string
 	GetContent() string
 	GetDesc() string
+	GetDate() string
 	From() string
 	Display()
 }
@@ -66,6 +68,10 @@ func (p post) GetContent() string {
 
 func (p post) GetDesc() string {
 	return p.desc
+}
+
+func (p post) GetDate() string {
+	return p.pubDate
 }
 
 func (p post) From() string {
