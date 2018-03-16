@@ -16,15 +16,12 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"sync"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/yujiahaol68/rossy/config"
 )
 
 var (
@@ -67,42 +64,10 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	err := config.ReadYAML(cfgFile)
 
-		dataDir := filepath.Join(home, "rossy_data")
-		if _, e := os.Stat(dataDir); os.IsNotExist(e) {
-			err = os.Mkdir(dataDir, os.ModePerm)
-			if err != nil {
-				log.Fatalln(err)
-				fmt.Println("Permission deny when try to create rossy_data Dir under $HOME")
-				os.Exit(1)
-			}
-		}
-
-		defaultCfg := []byte(fmt.Sprintf("dataDir: %s", dataDir))
-		err = ioutil.WriteFile(filepath.Join(home, ".rossy.yaml"), defaultCfg, 0644)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		// Search config in home directory with name ".rossy" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".rossy")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
+	if err != nil {
+		log.Fatalln(err)
 		fmt.Println("If you have .rossy.yaml config file. Please make sure it is under your $HOME dir or you need to specify its path by --config <PATH>")
 		fmt.Println("Config file name must be .rossy.yaml")
 		os.Exit(1)

@@ -32,11 +32,11 @@ type Feed interface {
 }
 
 type Source struct {
-	URL          string
-	ETag         string
-	LastModified string
-	Alias        string
-	Type         string
+	URL          string `json:"url"`
+	ETag         string `json:"etag"`
+	LastModified string `json:"last_modified"`
+	Alias        string `json:"alias"`
+	Type         string `json:"type"`
 }
 
 // SourceController will response to the costumer like CMD etc
@@ -84,7 +84,6 @@ func (p post) Display() {
 func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string) (s []*Source, reason error) {
 	defer close(tunnel)
 	s = make([]*Source, len(urls))
-	// TODO: validate url before access network
 
 	wg.Add(len(urls))
 	for i, u := range urls {
