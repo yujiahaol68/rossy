@@ -40,7 +40,7 @@ func Test_addNewFeed(t *testing.T) {
 		}
 	}()
 
-	_, err := cc.AddNewSource(tunnel, testUrls...)
+	_, err := cc.AddNewSource(tunnel, "default", testUrls...)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -29,8 +29,6 @@ var (
 )
 
 var (
-	// CheckList contains all the new feed that can be showed
-	CheckList []Feed
 	sourceReg = regexp.MustCompile(sourceHeaderReg)
 )
 

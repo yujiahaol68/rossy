@@ -7,40 +7,6 @@ import (
 	"github.com/yujiahaol68/rossy/logger"
 )
 
-// post implement Feed interface and hide the detail to customer
-type post struct {
-	title    string
-	url      string
-	desc     string
-	content  string
-	category string
-	pubDate  string
-}
-
-type category struct {
-	Name      string
-	Subscribe []string
-}
-
-// Feed is the entry point of every post consume by cmd
-type Feed interface {
-	GetName() string
-	GetSource() string
-	GetContent() string
-	GetDesc() string
-	GetDate() string
-	From() string
-	Display()
-}
-
-type Source struct {
-	URL          string `json:"url"`
-	ETag         string `json:"etag"`
-	LastModified string `json:"last_modified"`
-	Alias        string `json:"alias"`
-	Type         string `json:"type"`
-}
-
 // SourceController will response to the costumer like CMD etc
 type SourceController interface {
 	AddNewSource(url ...string) ([]Source, error)
@@ -54,40 +20,8 @@ var (
 	mutex sync.Mutex
 )
 
-func (p post) GetName() string {
-	return p.title
-}
-
-func (p post) GetSource() string {
-	return p.url
-}
-
-func (p post) GetContent() string {
-	return p.content
-}
-
-func (p post) GetDesc() string {
-	return p.desc
-}
-
-func (p post) GetDate() string {
-	return p.pubDate
-}
-
-func (p post) From() string {
-	return p.category
-}
-
-func (p post) String() string {
-	return fmt.Sprintf("%s\nsource:%s", p.title, p.url)
-}
-
-func (p post) Display() {
-	fmt.Println(p)
-}
-
 // AddNewSource bind with CMD: rossy add [url] [url] ...
-func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string) (s []*Source, reason error) {
+func (c CmdController) AddNewSource(tunnel chan *logger.Message, category string, urls ...string) (s []*Source, reason error) {
 	defer close(tunnel)
 	s = make([]*Source, len(urls))
 
@@ -108,6 +42,7 @@ func (c CmdController) AddNewSource(tunnel chan *logger.Message, urls ...string)
 			tunnel <- &logger.Message{Level: "info", Msg: fmt.Sprintf("Found %s feed: %s", source.Type, source.Alias)}
 
 			source.URL = url
+			source.Category = category
 			s[index] = source
 		}(i, u)
 	}

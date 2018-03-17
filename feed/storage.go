@@ -7,6 +7,25 @@ import (
 	"os"
 )
 
+type Post struct {
+	Title    string
+	Link     string
+	Desc     string
+	Content  string
+	Category string
+	PubDate  string
+	Status   string
+}
+
+type Source struct {
+	Category     string `json:"category"`
+	URL          string `json:"url"`
+	ETag         string `json:"etag"`
+	LastModified string `json:"last_modified"`
+	Alias        string `json:"alias"`
+	Type         string `json:"type"`
+}
+
 func SaveAsJSON(newSource []*Source, filePath string) error {
 	if !hasSource(filePath) {
 		return ioutil.WriteFile(filePath, toJSON(&newSource), 0644)

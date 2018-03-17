@@ -27,6 +27,8 @@ import (
 	"github.com/yujiahaol68/rossy/logger"
 )
 
+var category string
+
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add [URL] [URL] ...",
@@ -53,7 +55,7 @@ var addCmd = &cobra.Command{
 			}
 		}()
 
-		s, err := cc.AddNewSource(tunnel, args...)
+		s, err := cc.AddNewSource(tunnel, category, args...)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -72,4 +74,5 @@ var addCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(addCmd)
+	rootCmd.Flags().StringVarP(&category, "category", "c", "default", "Category of your source")
 }
