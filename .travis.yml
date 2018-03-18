@@ -12,6 +12,10 @@ before_install:
 
 script:
 - go get -t -v ./...
+- mkdir data
+- curl "https://api.mockaroo.com/api/278745a0?count=500&key=c32fb840" > "Rossy_Table_source.json"
+- mv Rossy_Table_source.json ./data
+- mv data ./app/database
 - go test github.com/yujiahaol68/rossy/app/database
 - rm -f ./app/database/db_test.go
 - go test -v -race ./...
