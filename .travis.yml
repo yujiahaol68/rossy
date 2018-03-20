@@ -9,13 +9,15 @@ before_install:
 - go get github.com/mitchellh/gox
 - go get github.com/inconshreveable/mousetrap
 - go get github.com/mattn/goveralls
+- mkdir data
+- curl "https://api.mockaroo.com/api/278745a0?count=10&key=c32fb840" > "source.json"
+- curl "https://api.mockaroo.com/api/0249e820?count=200&key=c32fb840" > "post.json"
+- curl "https://api.mockaroo.com/api/7f1258e0?count=6&key=c32fb840" > "category.json"
+- mv category.json post.json source.json data/
 
 script:
-- go get -t -v ./...
-- mkdir data
-- curl "https://api.mockaroo.com/api/278745a0?count=500&key=c32fb840" > "Rossy_Table_source.json"
-- mv Rossy_Table_source.json ./data
 - mv data ./app/database
+- go get -t -v ./...
 - go test github.com/yujiahaol68/rossy/app/database
 - rm -f ./app/database/db_test.go
 - go test -v -race ./...
