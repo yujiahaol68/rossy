@@ -26,9 +26,9 @@ func TestMain(m *testing.M) {
 
 func Test_GetSourceById(t *testing.T) {
 	s := service.Source{database.Conn()}
-	source := s.FindOne(int64(250))
+	source := s.FindOne(int64(57))
 
-	if source.ID != int64(250) {
+	if source.ID != int64(57) {
 		t.Fatalf("expect source ID is 250, but got %v", source.ID)
 	}
 }
