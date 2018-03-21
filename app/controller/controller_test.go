@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/yujiahaol68/rossy/app/controller"
 	"github.com/yujiahaol68/rossy/app/database"
 )
@@ -30,17 +31,14 @@ func TestMain(m *testing.M) {
 }
 
 func Test_AddNewSource(t *testing.T) {
-	_, err := controller.Source.Add(exampleFeedURL, 100)
-	if err == nil {
-		t.Fatalf("Should have error because ID out of range")
-	}
+	//_, err := controller.Source.Add(exampleFeedURL, 100)
+	//if err == nil {
+	//	t.Fatalf("Should have error because ID out of range")
+	//}
 
-	//_, er := controller.Source.Add(noAvailbleURL, 2)
-	//log.Fatal(er)
-	//assert.NotNil(t, er)
+	_, er := controller.Source.Add(noAvailbleURL, 2)
+	assert.NotNil(t, er)
 
 	_, e := controller.Source.Add(exampleFeedURL, 4)
-	if e != nil {
-		t.Fatal(e)
-	}
+	assert.Nil(t, e)
 }
