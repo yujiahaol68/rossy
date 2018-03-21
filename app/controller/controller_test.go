@@ -31,11 +31,13 @@ func TestMain(m *testing.M) {
 }
 
 func Test_AddNewSource(t *testing.T) {
-	_, err := controller.Source.Add(exampleFeedURL, 10)
+	_, err := controller.Source.Add(exampleFeedURL, 100)
+	log.Fatal(err)
 	assert.NotNil(t, err)
 
-	_, er := controller.Source.Add(noAvailbleURL, 2)
-	assert.NotNil(t, er)
+	//_, er := controller.Source.Add(noAvailbleURL, 2)
+	//log.Fatal(er)
+	//assert.NotNil(t, er)
 
 	_, e := controller.Source.Add(exampleFeedURL, 4)
 	assert.Nil(t, e)

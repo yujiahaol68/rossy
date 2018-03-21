@@ -34,7 +34,6 @@ func (sc SourceController) Add(url string, categoryID int64) (*entity.Source, er
 		Alias:        source.Alias,
 	}
 
-	db := database.Conn()
-	_, err = db.InsertOne(s)
+	_, err = database.Conn().InsertOne(s)
 	return s, err
 }

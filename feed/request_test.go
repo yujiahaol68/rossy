@@ -71,7 +71,7 @@ func Test_conditionalGET(t *testing.T) {
 }
 
 func Test_sourceByURL(t *testing.T) {
-	s, err := getSourceByURL(stdRSSurl)
+	s, err := GetSourceByURL(stdRSSurl)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func Test_sourceByURL(t *testing.T) {
 
 	fmt.Printf("Alias: %s\nType: %s\nEtag: %s\nLast-modified:%s\n", s.Alias, s.Type, s.ETag, s.LastModified)
 
-	s, err = getSourceByURL(atomURL)
+	s, err = GetSourceByURL(atomURL)
 
 	if err != nil {
 		t.Fatal(err)
@@ -92,14 +92,14 @@ func Test_sourceByURL(t *testing.T) {
 		t.Fatalf("expect atom feed type, but got %s", s.Type)
 	}
 
-	_, err = getSourceByURL(notFeedurl)
+	_, err = GetSourceByURL(notFeedurl)
 	if err != ErrInvalidSource {
 		t.Fatal(err)
 	}
 }
 
 func Test_notUTF8(t *testing.T) {
-	s, err := getSourceByURL(atomURL)
+	s, err := GetSourceByURL(atomURL)
 
 	if err != nil {
 		t.Fatal(err)
