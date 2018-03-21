@@ -21,17 +21,17 @@ func (sc SourceController) Add(url string, categoryID int64) (*entity.Source, er
 		return nil, err
 	}
 
+	c := category.FindOne(categoryID)
+	if c == nil {
+		return nil, errors.New("ID out of range")
+	}
+
 	s := &entity.Source{
 		Category:     categoryID,
 		URL:          url,
 		ETag:         source.ETag,
 		LastModified: source.LastModified,
 		Alias:        source.Alias,
-	}
-
-	c := category.FindOne(categoryID)
-	if c == nil {
-		return nil, errors.New("ID out of range")
 	}
 
 	db := database.Conn()
