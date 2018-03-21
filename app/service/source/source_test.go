@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/yujiahaol68/rossy/app/database"
-	"github.com/yujiahaol68/rossy/app/repo/source"
+	"github.com/yujiahaol68/rossy/app/service/source"
 )
 
 func setup() error {
