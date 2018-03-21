@@ -10,9 +10,9 @@ func FindOne(categoryID int64) *entity.Category {
 
 	s := new(entity.Category)
 	db.Id(categoryID).Get(s)
-	if s.ID == 0 {
-		return nil
+	if s.ID == categoryID {
+		return s
 	}
 
-	return s
+	return nil
 }
