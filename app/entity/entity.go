@@ -10,7 +10,8 @@ type Source struct {
 	ETag         string    `xorm:"'etag'" json:"etag"`
 	LastModified string    `json:"last_modified"`
 	Alias        string    `xorm:"notnull unique" json:"alias"`
-	CreateAt     time.Time `json:"create_at"  time_format:"2006-01-02 15:04:05"`
+	CreateAt     time.Time `xorm:"created" json:"create_at"  time_format:"2006-01-02 15:04:05"`
+	DeleteAt     time.Time `xorm:"deleted"`
 	Updated      time.Time `xorm:"updated"`
 }
 
@@ -23,6 +24,7 @@ type Post struct {
 	Content  string    `json:"content"`
 	Author   string    `json:"author"`
 	CreateAt time.Time `json:"create_at"  time_format:"2006-01-02 15:04:05"`
+	DeleteAt time.Time `xorm:"deleted"`
 	Unread   bool      `json:"unread"`
 }
 

@@ -1,12 +1,13 @@
-package service_test
+package source_test
 
 import (
 	"log"
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/yujiahaol68/rossy/app/database"
-	"github.com/yujiahaol68/rossy/app/service"
+	"github.com/yujiahaol68/rossy/app/repo/source"
 )
 
 func setup() error {
@@ -25,10 +26,6 @@ func TestMain(m *testing.M) {
 }
 
 func Test_GetSourceById(t *testing.T) {
-	s := service.Source{database.Conn()}
-	source := s.FindOne(int64(5))
-
-	if source.ID != int64(5) {
-		t.Fatalf("expect source ID is 5, but got %v", source.ID)
-	}
+	source := source.FindOne(int64(5))
+	assert.Equal(t, int64(5), source.ID)
 }

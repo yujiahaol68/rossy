@@ -30,7 +30,7 @@ func (c CmdController) AddNewSource(tunnel chan *logger.Message, category string
 		go func(index int, url string) {
 			defer wg.Done()
 
-			source, err := getSourceByURL(url)
+			source, err := GetSourceByURL(url)
 			if err != nil {
 				if err == ErrUserNetwork {
 					reason = err

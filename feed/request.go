@@ -32,7 +32,7 @@ var (
 	sourceReg = regexp.MustCompile(sourceHeaderReg)
 )
 
-func getSourceByURL(url string) (*Source, error) {
+func GetSourceByURL(url string) (*Source, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		if err, ok := err.(net.Error); ok && err.Timeout() {
