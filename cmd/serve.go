@@ -15,12 +15,8 @@
 package cmd
 
 import (
-	"database/sql"
-	"log"
-	"os"
-
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
+	"github.com/yujiahaol68/rossy/app"
 )
 
 // serveCmd represents the serve command
@@ -29,13 +25,7 @@ var serveCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, e := os.Stat("./feed_data.db"); os.IsNotExist(e) {
-			db, err := sql.Open("sqlite3", "./feed_data.db")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer db.Close()
-		}
+		app.Run()
 	},
 }
 
