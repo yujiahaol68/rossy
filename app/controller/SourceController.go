@@ -14,7 +14,7 @@ type SourceController struct{}
 
 var Source SourceController = SourceController{}
 
-func (sc SourceController) Add(url string, categoryID int64) (*entity.Source, error) {
+func (ctrl *SourceController) Add(url string, categoryID int64) (*entity.Source, error) {
 	source, err := feed.GetSourceByURL(url)
 
 	if err != nil {
