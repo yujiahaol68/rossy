@@ -31,10 +31,8 @@ func TestMain(m *testing.M) {
 }
 
 func Test_AddNewSource(t *testing.T) {
-	//_, err := controller.Source.Add(exampleFeedURL, 100)
-	//if err == nil {
-	//	t.Fatalf("Should have error because ID out of range")
-	//}
+	_, err := controller.Source.Add(exampleFeedURL, 10)
+	assert.NotNil(t, err)
 
 	_, er := controller.Source.Add(noAvailbleURL, 2)
 	assert.NotNil(t, er)
