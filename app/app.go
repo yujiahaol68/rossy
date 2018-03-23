@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/yujiahaol68/rossy/app/database"
 	"github.com/yujiahaol68/rossy/app/routers/api"
 )
 
@@ -10,6 +11,13 @@ func register(r *gin.Engine) {
 }
 
 func Run() {
+	database.Open()
+
+	err := database.Sync()
+	if err != nil {
+		panic(err)
+	}
+
 	gin.SetMode(gin.DebugMode)
 
 	router := gin.Default()

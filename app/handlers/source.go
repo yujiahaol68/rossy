@@ -25,5 +25,5 @@ func PostSource(c *gin.Context) {
 		return
 	}
 
-	ResultOk(c, nil)
+	ResultCreated(c)
 }

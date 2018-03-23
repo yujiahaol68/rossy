@@ -10,6 +10,10 @@ func Result(ctx *gin.Context, code int, data interface{}, msg string) {
 	ctx.JSON(http.StatusOK, gin.H{"code": code, "data": data, "msg": msg})
 }
 
+func ResultCreated(ctx *gin.Context) {
+	ctx.JSON(http.StatusCreated, gin.H{"code": http.StatusCreated, "data": "", "msg": ""})
+}
+
 func ResultOk(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": data, "msg": ""})
 }
