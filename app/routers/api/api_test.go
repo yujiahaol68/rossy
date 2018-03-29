@@ -56,6 +56,17 @@ func Test_Source(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := makeJSONReq("POST", "/api/source/", &check)
 	router.ServeHTTP(w, req)
-
 	assert.Equal(t, http.StatusCreated, w.Code)
+
+	w = httptest.NewRecorder()
+	check.URL = "http://www.ruanyifeng.com/blog/atom.xml"
+	req = makeJSONReq("POST", "/api/source/", &check)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusFound, w.Code)
+
+	w = httptest.NewRecorder()
+	check.Category = 0
+	req = makeJSONReq("POST", "/api/source/", &check)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }

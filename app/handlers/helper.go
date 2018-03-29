@@ -26,8 +26,8 @@ func ResultOkMsg(ctx *gin.Context, data interface{}, msg string) {
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": data, "msg": msg})
 }
 
-func ResultFail(ctx *gin.Context, err interface{}) {
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusBadRequest, "data": nil, "msg": err})
+func ResultFail(ctx *gin.Context, code int, err interface{}) {
+	ctx.JSON(code, gin.H{"code": code, "data": nil, "msg": err})
 }
 
 func ResultFailData(ctx *gin.Context, data interface{}, err interface{}) {

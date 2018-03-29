@@ -7,6 +7,7 @@ import (
 
 	"github.com/yujiahaol68/rossy/app/entity"
 	"github.com/yujiahaol68/rossy/app/service/category"
+	sourceService "github.com/yujiahaol68/rossy/app/service/source"
 	"github.com/yujiahaol68/rossy/feed"
 )
 
@@ -32,6 +33,11 @@ func (ctrl *SourceController) Add(url string, categoryID int64) (*entity.Source,
 		ETag:         source.ETag,
 		LastModified: source.LastModified,
 		Alias:        source.Alias,
+	}
+
+	es := sourceService.FindByURL(url)
+	if es.ID != 0 {
+		return nil, errors.New("Source exist")
 	}
 
 	_, err = database.Conn().InsertOne(s)

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/yujiahaol68/rossy/app/controller"
@@ -12,18 +12,16 @@ func PostSource(c *gin.Context) {
 	var newFeedSource checkpoint.PostSource
 	err := c.ShouldBindJSON(&newFeedSource)
 	if err != nil {
-		log.Fatal(err)
-		ResultFail(c, err)
+		ResultFail(c, http.StatusBadRequest, err)
+		c.Abort()
 		return
 	}
 
 	_, err = controller.Source.Add(newFeedSource.URL, newFeedSource.Category)
 
 	if err != nil {
-		log.Fatal(err)
-		ResultFail(c, err)
-		return
+		ResultFail(c, http.StatusFound, err)
+	} else {
+		ResultCreated(c)
 	}
-
-	ResultCreated(c)
 }
