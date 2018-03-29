@@ -29,3 +29,12 @@ func Test_GetSourceById(t *testing.T) {
 	source := source.FindOne(int64(5))
 	assert.Equal(t, int64(5), source.ID)
 }
+
+func Test_GetByURL(t *testing.T) {
+	s := source.FindByURL("https://tonybai.com/feed/")
+	assert.Equal(t, int64(4), s.ID)
+
+	a := source.FindByURL("njvbbfhee")
+	assert.Equal(t, int64(0), a.ID)
+	assert.NotEqual(t, "njvbbfhee", a.URL)
+}

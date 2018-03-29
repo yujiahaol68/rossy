@@ -6,7 +6,7 @@ import "time"
 type Source struct {
 	ID           int64     `xorm:"pk autoincr 'id'" json:"id"`
 	Category     int64     `xorm:"notnull 'category_id'" json:"category"`
-	URL          string    `xorm:"notnull unique 'url'" json:"url"`
+	URL          string    `xorm:"notnull 'url'" json:"url"`
 	ETag         string    `xorm:"'etag'" json:"etag"`
 	LastModified string    `json:"last_modified"`
 	Alias        string    `xorm:"notnull" json:"alias"`
