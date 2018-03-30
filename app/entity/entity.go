@@ -18,6 +18,7 @@ type Source struct {
 // Post entity
 type Post struct {
 	ID       int64     `xorm:"pk autoincr 'id'" json:"id"`
+	Desc     string    `xorm:"notnull" json:"summary"`
 	From     int64     `xorm:"notnull 'source_id'"`
 	Title    string    `xorm:"notnull" json:"title"`
 	Link     string    `xorm:"notnull unique" json:"link"`
