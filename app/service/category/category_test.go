@@ -32,3 +32,8 @@ func Test_FindCategoryById(t *testing.T) {
 	c = category.FindOne(5)
 	assert.NotNil(t, c)
 }
+
+func Test_List(t *testing.T) {
+	cl := category.List()
+	assert.NotEqual(t, len(cl), 0)
+}

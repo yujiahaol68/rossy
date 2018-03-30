@@ -70,3 +70,12 @@ func Test_Source(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
+
+func Test_category(t *testing.T) {
+	t.Log("GET: /api/categories")
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/categories/", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}

@@ -8,14 +8,16 @@ type PostSource struct {
 
 // DelSource is checkpoint for DEL /source/:id
 type DelSource struct {
-	ID int64 `form:"id" validate:"min=1"`
+	ID int64 `json:"id" validate:"min=1"`
 }
 
-// PutSource is checkpoint for PUT /source:id
+// PutSource is checkpoint for PUT /source/:id
 type PutSource struct {
+	Alias    string `json:"alias"`
+	Category int64  `json:"category_id"`
 }
 
-// GetSourceListBy is checkpoint for GET /source?category=xx
-type GetSourceListBy struct {
-	Category int64 `form:"category" binding:"required"`
+// GetSourceList is checkpoint for GET /source?category=xx
+type GetSourceList struct {
+	Category string `form:"category"`
 }

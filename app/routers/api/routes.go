@@ -12,4 +12,9 @@ func Router(router *gin.Engine) {
 		source := apiRouter.Group("source")
 		source.POST("/", handlers.PostSource)
 	}
+
+	{
+		category := apiRouter.Group("categories")
+		category.GET("/", handlers.GetCategoryList)
+	}
 }

@@ -16,3 +16,12 @@ func FindOne(categoryID int64) *entity.Category {
 
 	return nil
 }
+
+func List() []*entity.Category {
+	db := database.Conn()
+
+	cl := make([]*entity.Category, 0)
+
+	db.Find(&cl)
+	return cl
+}
