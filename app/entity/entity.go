@@ -20,7 +20,7 @@ type Post struct {
 	ID       int64     `xorm:"pk autoincr 'id'" json:"id"`
 	From     int64     `xorm:"notnull 'source_id'"`
 	Title    string    `xorm:"notnull" json:"title"`
-	Link     string    `xorm:"notnull" json:"link"`
+	Link     string    `xorm:"notnull unique" json:"link"`
 	Content  string    `json:"content"`
 	Author   string    `json:"author"`
 	CreateAt time.Time `json:"create_at"  time_format:"2006-01-02 15:04:05"`

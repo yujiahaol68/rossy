@@ -5,6 +5,7 @@ import (
 	"github.com/yujiahaol68/rossy/app/handlers"
 )
 
+// Router will register all the routes
 func Router(router *gin.Engine) {
 	apiRouter := router.Group("api")
 
