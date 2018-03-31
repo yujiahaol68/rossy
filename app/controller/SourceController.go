@@ -42,5 +42,8 @@ func (ctrl *SourceController) Add(url string, categoryID int64) (*entity.Source,
 	}
 
 	_, err = database.Conn().InsertOne(s)
+
+	go post.AddNewFeeder(feed.RequestCache[url], s.ID)
+
 	return s, err
 }
