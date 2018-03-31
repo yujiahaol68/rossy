@@ -5,10 +5,10 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"regexp"
 
 	"github.com/yujiahaol68/rossy/atom"
@@ -40,16 +40,9 @@ func GetSourceByURL(url string) (*Source, error) {
 		}
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	if feedType := sourceType(resp.Header.Get("content-type")); feedType != "" {
-		dump, err := httputil.DumpResponse(resp, true)
-		if err != nil {
-			return nil, err
-		}
-		RequestCache[url] = dump
-
-		return getSourceDesc(&dump, feedType, resp.Header.Get("last-modified"), resp.Header.Get("etag"))
+		return getSourceDesc(resp, url, feedType)
 	}
 	return nil, ErrInvalidSource
 }
@@ -58,36 +51,44 @@ func sourceType(header string) string {
 	return sourceReg.FindString(header)
 }
 
-func getSourceDesc(bodyContent *[]byte, feedType string, last string, etag string) (*Source, error) {
-	d := xml.NewDecoder(bytes.NewReader(*bodyContent))
+func getSourceDesc(rsp *http.Response, url, feedType string) (*Source, error) {
+	bodyContent, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return nil, CmdErrXMLParse
+	}
+	defer rsp.Body.Close()
+
+	d := xml.NewDecoder(bytes.NewReader(bodyContent))
 	d.CharsetReader = func(s string, reader io.Reader) (io.Reader, error) {
 		return charset.NewReader(reader, s)
 	}
 
 	s := new(Source)
-	s.LastModified = last
-	s.ETag = etag
+	s.LastModified = rsp.Header.Get("last-modified")
+	s.ETag = rsp.Header.Get("etag")
 	s.Type = feedType
 
 	switch feedType {
 	case "rss":
 		r := rss.New()
-		err := d.Decode(r)
+		err = d.Decode(r)
 
 		if err != nil {
 			return nil, CmdErrXMLParse
 		}
+		RequestCache[url] = r
 
 		s.Alias = r.Description
 		return s, nil
 
 	case "atom":
 		a := atom.New()
-		err := d.Decode(a)
+		err = d.Decode(a)
 
 		if err != nil {
 			return nil, CmdErrXMLParse
 		}
+		RequestCache[url] = a
 
 		s.Alias = a.Title
 		return s, nil
@@ -97,23 +98,25 @@ func getSourceDesc(bodyContent *[]byte, feedType string, last string, etag strin
 		rp := rss.New()
 		ap := atom.New()
 
-		if bytes.Contains(*bodyContent, []byte("<feed")) {
-			err := d.Decode(&ap)
+		if bytes.Contains(bodyContent, []byte("<feed")) {
+			err = d.Decode(&ap)
 			if err != nil {
 				log.Fatal(err)
 				return nil, CmdErrXMLParse
 			}
+			RequestCache[url] = ap
 
 			s.Alias = ap.Title
 			s.Type = "atom"
 			return s, nil
 		}
 
-		err := d.Decode(&rp)
+		err = d.Decode(&rp)
 		if err != nil {
 			log.Fatal(err)
 			return nil, CmdErrXMLParse
 		}
+		RequestCache[url] = rp
 
 		s.Alias = rp.Description
 		s.Type = "rss"

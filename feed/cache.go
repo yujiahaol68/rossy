@@ -1,3 +1,3 @@
 package feed
 
-var RequestCache = make(map[string][]byte)
+var RequestCache = make(map[string]Feeder)

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/yujiahaol68/rossy/app/entity"
 )
 
 type Post struct {
@@ -24,6 +26,12 @@ type Source struct {
 	LastModified string `json:"last_modified"`
 	Alias        string `json:"alias"`
 	Type         string `json:"type"`
+}
+
+// Feeder in Cache and used by app
+type Feeder interface {
+	Convert() []*entity.Post
+	Diff(latest *entity.Post, underCondition bool) []*entity.Post
 }
 
 func SaveAsJSON(newSource []*Source, filePath string) error {
