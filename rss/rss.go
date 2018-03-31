@@ -58,8 +58,8 @@ func (r *Rss) Convert() []*entity.Post {
 		p.Title = item.Title
 		p.CreateAt = t
 		p.Desc = string(item.Description)
-		if string(item.Content) != "" {
-			p.Content = string(item.Content)
+		if c := string(item.Content); c != "" {
+			p.Content = c
 		}
 		p.Link = item.Link
 		if item.Author == "" {
@@ -74,6 +74,22 @@ func (r *Rss) Convert() []*entity.Post {
 	return pl
 }
 
-//func (r *Rss) Diff(latest *entity.Post) []*entity.Post {
-//
-//}
+func (r *Rss) Diff(latest *entity.Post, underCondition bool) []*entity.Post {
+	if underCondition {
+		return r.Convert()
+	}
+	var diffIndex int
+
+	for i, item := range r.ItemList {
+		if item.Link == latest.Link {
+			diffIndex = i
+			break
+		}
+	}
+
+	if diffIndex == 0 {
+		return r.Convert()
+	}
+	r.ItemList = r.ItemList[:diffIndex]
+	return r.Convert()
+}

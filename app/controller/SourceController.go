@@ -33,6 +33,7 @@ func (ctrl *SourceController) Add(url string, categoryID int64) (*entity.Source,
 		ETag:         source.ETag,
 		LastModified: source.LastModified,
 		Alias:        source.Alias,
+		Kind:         source.Type,
 	}
 
 	es := sourceService.FindByURL(url)

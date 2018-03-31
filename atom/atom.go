@@ -1,7 +1,12 @@
 // Package atom defines XML data structures for an Atom feed.
 package atom
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"time"
+
+	"github.com/yujiahaol68/rossy/app/entity"
+)
 
 type Atom struct {
 	XMLName   xml.Name `xml:"http://www.w3.org/2005/Atom feed"`
@@ -37,4 +42,59 @@ type Entry struct {
 func New() *Atom {
 	a := Atom{}
 	return &a
+}
+
+func (a *Atom) Convert() []*entity.Post {
+	if len(a.EntryList) == 0 {
+		return nil
+	}
+
+	pl := make([]*entity.Post, len(a.EntryList))
+
+	for i, entry := range a.EntryList {
+		t, err := time.Parse("2017-06-23T11:49:32Z", entry.Updated)
+		if err != nil {
+			t = time.Now()
+		}
+
+		p := new(entity.Post)
+		p.Unread = true
+		p.Title = entry.Title
+		p.CreateAt = t
+		p.Desc = string(entry.Summary)
+		if c := string(entry.Content); c != "" {
+			p.Content = c
+		}
+		p.Link = entry.Link.Href
+		if entry.Author.Name == "" {
+			p.Author = a.Author.Name
+		} else {
+			p.Author = entry.Author.Name
+		}
+
+		pl[i] = p
+	}
+
+	return pl
+}
+
+func (a *Atom) Diff(latest *entity.Post, underCondition bool) []*entity.Post {
+	if underCondition {
+		return a.Convert()
+	}
+
+	var diffIndex int
+
+	for i, entry := range a.EntryList {
+		if entry.Link.Href == latest.Link {
+			diffIndex = i
+			break
+		}
+	}
+
+	if diffIndex == 0 {
+		return a.Convert()
+	}
+	a.EntryList = a.EntryList[:diffIndex]
+	return a.Convert()
 }
