@@ -5,12 +5,12 @@ import "time"
 // Source entity
 type Source struct {
 	ID           int64     `xorm:"pk autoincr 'id'" json:"id"`
-	Category     int64     `xorm:"notnull 'category_id'" json:"category"`
+	Category     int64     `xorm:"notnull 'category_id'" json:"category_id"`
 	URL          string    `xorm:"notnull 'url'" json:"url"`
 	ETag         string    `xorm:"'etag'" json:"etag"`
 	LastModified string    `json:"last_modified"`
 	Alias        string    `xorm:"notnull" json:"alias"`
-	Kind         string    `xorm:"notnull default rss"`
+	Kind         string    `xorm:"notnull"`
 	CreateAt     time.Time `xorm:"created" json:"create_at"  time_format:"2006-01-02 15:04:05"`
 	DeleteAt     time.Time `xorm:"deleted"`
 	Updated      time.Time `xorm:"updated"`

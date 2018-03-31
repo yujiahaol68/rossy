@@ -25,18 +25,18 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-const sql1 = `SELECT source_id, category_id, alias, COUNT(unread)
+const sql1 = `SELECT source_id, category_id, alias, name, COUNT(unread) AS count
 FROM (post LEFT JOIN source ON source_id = source.id)
 LEFT JOIN category ON category.id = category_id
 WHERE unread = 0
 GROUP BY source_id
-ORDER BY COUNT(unread)`
+ORDER BY count;`
 
 const sql2 = ``
 
 func Test_CountUnreadSQL(t *testing.T) {
 	db := database.Conn()
-	r, err := db.Query(sql2)
+	r, err := db.Query(sql1)
 	if err != nil {
 		t.Fatal(err)
 	}
