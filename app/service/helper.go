@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/binary"
 	"fmt"
+	"strconv"
 
 	"github.com/go-xorm/xorm"
 )
@@ -19,4 +20,9 @@ func CheckTableCountLT(minCount int64, table string, db *xorm.Engine) (bool, err
 	}
 
 	return minCount <= actualCount, nil
+}
+
+func ToInt64(b []byte) int64 {
+	i, _ := strconv.ParseInt(string(b), 10, 64)
+	return i
 }

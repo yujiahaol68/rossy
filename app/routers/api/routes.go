@@ -12,6 +12,7 @@ func Router(router *gin.Engine) {
 	{
 		source := apiRouter.Group("source")
 		source.POST("/", handlers.PostSource)
+		source.GET("/unread", handlers.GetUnreadSourceList)
 	}
 
 	{

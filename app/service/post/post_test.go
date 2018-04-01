@@ -1,8 +1,6 @@
 package post_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -23,33 +21,4 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 	os.Exit(code)
-}
-
-const sql1 = `SELECT source_id, category_id, alias, name, COUNT(unread) AS count
-FROM (post LEFT JOIN source ON source_id = source.id)
-LEFT JOIN category ON category.id = category_id
-WHERE unread = 0
-GROUP BY source_id
-ORDER BY count;`
-
-const sql2 = ``
-
-func Test_CountUnreadSQL(t *testing.T) {
-	db := database.Conn()
-	r, err := db.Query(sql1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	printResult(&r)
-	i := string(r[5]["COUNT(unread)"])
-	fmt.Println(i)
-	//fmt.Println(len(r))
-}
-
-func printResult(r *[]map[string][]byte) {
-	b, err := json.MarshalIndent(r, "", "  ")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	fmt.Println(string(b))
 }

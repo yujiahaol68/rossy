@@ -3,6 +3,7 @@ package api_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -69,6 +70,12 @@ func Test_Source(t *testing.T) {
 	req = makeJSONReq("POST", "/api/source/", &check)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	w = httptest.NewRecorder()
+	req = makeJSONReq("GET", "/api/source/unread", nil)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	fmt.Println(w.Body.String())
 }
 
 func Test_category(t *testing.T) {
