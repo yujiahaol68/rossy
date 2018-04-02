@@ -19,4 +19,11 @@ func Router(router *gin.Engine) {
 		category := apiRouter.Group("categories")
 		category.GET("/", handlers.GetCategoryList)
 	}
+
+	{
+		post := apiRouter.Group("post")
+		post.GET("/", handlers.GetPostList)
+		post.GET("/unread", handlers.GetUnreadPostList)
+		post.GET("/source/:id", handlers.GetSourcePostList)
+	}
 }

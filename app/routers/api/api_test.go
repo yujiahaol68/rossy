@@ -86,3 +86,26 @@ func Test_category(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }
+
+func Test_post(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/post/?offset=1&limit=5", nil)
+	req.Header.Set("Accept", "application/json")
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	fmt.Println(w.Body.String())
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/api/post/unread?offset=1&limit=4", nil)
+	req.Header.Set("Accept", "application/json")
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	fmt.Println(w.Body.String())
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/api/post/source/1?offset=1&limit=4", nil)
+	req.Header.Set("Accept", "application/json")
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	fmt.Println(w.Body.String())
+}

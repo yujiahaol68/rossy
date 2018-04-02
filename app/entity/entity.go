@@ -25,7 +25,7 @@ type Post struct {
 	Link     string    `xorm:"notnull unique" json:"link"`
 	Content  string    `json:"content"`
 	Author   string    `json:"author"`
-	CreateAt time.Time `json:"create_at"  time_format:"2006-01-02 15:04:05"`
+	CreateAt time.Time `xorm:"notnull" json:"create_at"  time_format:"2006-01-02 15:04:05"`
 	DeleteAt time.Time `xorm:"deleted"`
 	Unread   bool      `json:"unread"`
 }

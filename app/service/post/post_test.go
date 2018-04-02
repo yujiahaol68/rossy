@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/yujiahaol68/rossy/app/service/post"
+
 	"github.com/yujiahaol68/rossy/app/database"
 )
 
@@ -21,4 +23,11 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 	os.Exit(code)
+}
+
+func Test_readList(t *testing.T) {
+	_, err := post.List(1, 4)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
