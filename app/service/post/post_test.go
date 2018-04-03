@@ -31,3 +31,10 @@ func Test_readList(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func Test_Del(t *testing.T) {
+	err := post.DelBySource(int64(1))
+	if err != nil {
+		t.Fatal(err)
+	}
+}

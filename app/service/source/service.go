@@ -11,7 +11,7 @@ const (
 	unreadSourceList = `SELECT source_id, category_id, alias, name, COUNT(unread) AS count
 	FROM (post LEFT JOIN source ON source_id = source.id)
 	LEFT JOIN category ON category.id = category_id
-	WHERE unread = 0
+	WHERE unread = 0 AND (post.delete_at IS NULL)
 	GROUP BY source_id
 	ORDER BY count;`
 )

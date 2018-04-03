@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/yujiahaol68/rossy/app/service/source"
 
@@ -37,4 +38,25 @@ func GetUnreadSourceList(c *gin.Context) {
 	}
 
 	ResultOk(c, data)
+}
+
+func Unsubscribe(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		ResultFail(c, http.StatusBadRequest, err)
+		c.Abort()
+		return
+	}
+
+	if err := controller.Source.Unsubscribe(id); err != nil {
+		if err.Error() == "Not Found" {
+			ResultFail(c, http.StatusNotFound, err)
+		} else {
+			ResultFail(c, http.StatusInternalServerError, err)
+		}
+		c.Abort()
+		return
+	}
+
+	ResultOk(c, nil)
 }

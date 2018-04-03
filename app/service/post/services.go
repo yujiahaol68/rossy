@@ -46,3 +46,9 @@ func SourceList(sourceID int64, limit, offset int) ([]*entity.Post, error) {
 
 	return srl, err
 }
+
+func DelBySource(source int64) error {
+	db := database.Conn()
+	_, err := db.Where("post.source_id = ?", source).Delete(&entity.Post{})
+	return err
+}

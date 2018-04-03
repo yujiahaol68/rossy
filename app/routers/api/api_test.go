@@ -76,6 +76,11 @@ func Test_Source(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	fmt.Println(w.Body.String())
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("DELETE", "/api/source/3", nil)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
 }
 
 func Test_category(t *testing.T) {
