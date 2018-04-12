@@ -5,6 +5,16 @@ go:
   - "1.10.x"
   - "1.9"
 
+before_cache:
+- rm -rf $GOPATH/src/github.com/yujiahaol68/rossy/*
+- rm -rf $GOPATH/pkg/**/github.com/yujiahaol68/rossy
+- rm -rf $GOPATH/src/github.com/mattn/go-sqlite3
+
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
+
 before_install:
 - go get github.com/mitchellh/gox
 - go get github.com/inconshreveable/mousetrap
@@ -17,7 +27,7 @@ before_install:
 
 script:
 - mv data ./app/database
-- go get -t -v ./...
+- go get -u -t -v ./...
 - go test github.com/yujiahaol68/rossy/app/database
 - rm -f ./app/database/db_test.go
 - $GOPATH/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
