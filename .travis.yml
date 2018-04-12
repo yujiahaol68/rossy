@@ -21,9 +21,9 @@ before_install:
 - go get github.com/inconshreveable/mousetrap
 - go get github.com/mattn/goveralls
 - mkdir data
-- curl -z "https://api.mockaroo.com/api/278745a0?count=10&key=c32fb840" -o /var/tmp/mock/source.json
-- curl -z "https://api.mockaroo.com/api/0249e820?count=200&key=c32fb840" -o /var/tmp/mock/post.json
-- curl -z "https://api.mockaroo.com/api/7f1258e0?count=6&key=c32fb840" -o /var/tmp/mock/category.json
+- curl -z --url https://api.mockaroo.com/api/278745a0?count=10&key=c32fb840 -o /var/tmp/mock/source.json
+- curl -z --url https://api.mockaroo.com/api/0249e820?count=200&key=c32fb840 -o /var/tmp/mock/post.json
+- curl -z --url https://api.mockaroo.com/api/7f1258e0?count=6&key=c32fb840 -o /var/tmp/mock/category.json
 - mv /var/tmp/mock/*.json data/
 
 script:
