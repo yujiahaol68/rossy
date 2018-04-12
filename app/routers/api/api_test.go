@@ -90,6 +90,13 @@ func Test_category(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+
+	t.Log("GET: /api/categories/:id?name=xxx")
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("PUT", "/api/categories/1?name=abcd", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
 }
 
 func Test_post(t *testing.T) {

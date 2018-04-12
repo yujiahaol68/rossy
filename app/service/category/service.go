@@ -25,3 +25,12 @@ func List() []*entity.Category {
 	db.Find(&cl)
 	return cl
 }
+
+func ChangeName(id int64, newName string) error {
+	db := database.Conn()
+
+	s := new(entity.Category)
+	s.Name = newName
+	_, err := db.Id(id).Update(s)
+	return err
+}
