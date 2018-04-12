@@ -27,7 +27,7 @@ before_install:
 
 script:
 - mv data ./app/database
-- go get -u -t -v ./...
+- go get -t -v ./...
 - go test github.com/yujiahaol68/rossy/app/database
 - rm -f ./app/database/db_test.go
 - $GOPATH/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
