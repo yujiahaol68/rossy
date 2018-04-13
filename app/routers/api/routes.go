@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/yujiahaol68/rossy/app/handlers"
+	"github.com/yujiahaol68/rossy/socket"
 )
 
 // Router will register all the routes
@@ -27,5 +28,13 @@ func Router(router *gin.Engine) {
 		post.GET("/", handlers.GetPostList)
 		post.GET("/unread", handlers.GetUnreadPostList)
 		post.GET("/source/:id", handlers.GetSourcePostList)
+	}
+
+	{
+		socket.Enable = true
+		ws := apiRouter.Group("ws")
+		ws.GET("/", func(c *gin.Context) {
+			socket.Wshandler(c.Writer, c.Request)
+		})
 	}
 }
