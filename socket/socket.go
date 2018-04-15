@@ -7,4 +7,5 @@ var Enable = false
 type Notificater interface {
 	Listen(c chan string)
 	Push(msg string)
+	ReadPump()
 }
