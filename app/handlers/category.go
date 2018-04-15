@@ -5,10 +5,30 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/yujiahaol68/rossy/app/model/checkpoint"
+
 	"github.com/gin-gonic/gin"
 	"github.com/yujiahaol68/rossy/app/controller"
 	"github.com/yujiahaol68/rossy/app/service/category"
 )
+
+func PostNewCategory(c *gin.Context) {
+	nc := new(checkpoint.PostCategory)
+	err := c.BindJSON(nc)
+	if err != nil {
+		c.Abort()
+		ResultFail(c, http.StatusBadRequest, err)
+		return
+	}
+
+	err = controller.Category.Create(nc.Name)
+	if err != nil {
+		c.Abort()
+		ResultFail(c, http.StatusBadRequest, "duplicated name")
+		return
+	}
+	ResultOk(c, nil)
+}
 
 func GetCategoryList(c *gin.Context) {
 	cl := controller.Category.List()

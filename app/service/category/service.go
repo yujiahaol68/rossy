@@ -17,6 +17,13 @@ func FindOne(categoryID int64) *entity.Category {
 	return nil
 }
 
+func InsertOne(c *entity.Category) error {
+	db := database.Conn()
+
+	_, err := db.Insert(c)
+	return err
+}
+
 func List() []*entity.Category {
 	db := database.Conn()
 

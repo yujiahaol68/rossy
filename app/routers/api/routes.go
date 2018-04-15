@@ -19,6 +19,7 @@ func Router(router *gin.Engine) {
 
 	{
 		category := apiRouter.Group("categories")
+		category.POST("/", handlers.PostNewCategory)
 		category.GET("/", handlers.GetCategoryList)
 		category.PUT("/:id", handlers.UpdateCategoryName)
 	}

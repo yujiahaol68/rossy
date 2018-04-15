@@ -95,7 +95,13 @@ func Test_category(t *testing.T) {
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("PUT", "/api/categories/1?name=abcd", nil)
 	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
 
+	t.Log("POST: /api/categories")
+	checkNew := checkpoint.PostCategory{"DS520"}
+	w = httptest.NewRecorder()
+	req = makeJSONReq("POST", "/api/categories/", &checkNew)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
