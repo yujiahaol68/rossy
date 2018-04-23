@@ -31,5 +31,23 @@ script:
 - go test github.com/yujiahaol68/rossy/app/database
 - rm -f ./app/database/db_test.go
 - $GOPATH/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
-- gox -os="linux darwin windows" -arch="amd64" -output="rossy.{{.OS}}.{{.Arch}}" -verbose ./...
+- go build main.go
+
+before_deploy:
+- gox -tags="jsoniter" -os="linux darwin windows" -arch="amd64" -output="rossy_{{.OS}}_{{.Arch}}" -verbose ./...
 - du -sh * | grep -e "darwin" -e "linux" -e "windows"
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: $AUTH_TOKEN
+  file:
+  - rossy_windows_amd64.exe
+  - rossy_darwin_amd64
+  - rossy_linux_amd64
+  on:
+    tags: true
+    branches:
+      only:
+        - release
