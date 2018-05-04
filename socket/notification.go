@@ -24,6 +24,9 @@ type notification struct {
 var wsupgrader = websocket.Upgrader{
 	ReadBufferSize:  512,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 // Notices globally holds user msg that we want to send, the Push func is concurrency safe
@@ -80,8 +83,7 @@ func (uc *notification) ReadPump() {
 	uc.SetReadDeadline(time.Now().Add(pongWait))
 	uc.SetPongHandler(func(string) error { uc.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, _, err := uc.ReadMessage()
-		if err != nil {
+		if _, _, err := uc.ReadMessage(); err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Fatal(err)
 				break

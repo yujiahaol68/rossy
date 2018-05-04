@@ -16,3 +16,4 @@
 # sqlite DB file
 app/database/rossy_data.db
 app/database/data
+rossy_data.db
