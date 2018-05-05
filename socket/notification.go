@@ -34,6 +34,7 @@ var Notices Notificater = new(notification)
 
 func (uc *notification) Push(msg string) {
 	if !Enable {
+		fmt.Printf("Socket send: %s\n", msg)
 		return
 	}
 	uc.Hub <- msg
@@ -54,6 +55,7 @@ func (uc *notification) Listen(msgChan chan string) {
 			uc.SetWriteDeadline(time.Now().Add(writeWait))
 			w, err := uc.NextWriter(websocket.TextMessage)
 			if err != nil {
+				Enable = false
 				log.Fatal(err)
 				return
 			}
@@ -65,12 +67,14 @@ func (uc *notification) Listen(msgChan chan string) {
 			}
 
 			if err = w.Close(); err != nil {
+				Enable = false
 				log.Fatal(err)
 				return
 			}
 
 		case <-ticker.C:
 			if err := uc.write(websocket.PingMessage, []byte{}); err != nil {
+				Enable = false
 				log.Fatal(err)
 				return
 			}
@@ -85,6 +89,7 @@ func (uc *notification) ReadPump() {
 	for {
 		if _, _, err := uc.ReadMessage(); err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+				Enable = false
 				log.Fatal(err)
 				break
 			}

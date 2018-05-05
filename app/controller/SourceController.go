@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/yujiahaol68/rossy/app/database"
+	"github.com/yujiahaol68/rossy/socket"
 
 	"github.com/yujiahaol68/rossy/app/entity"
 	"github.com/yujiahaol68/rossy/app/service/category"
@@ -80,6 +81,5 @@ func (ctrl *SourceController) UpdateAll() {
 	}()
 
 	feed.Update(sl, c)
-	// Send result by websocket
-	fmt.Printf("Rossy Total Update: %d posts", int(counter))
+	socket.Notices.Push(fmt.Sprintf("post-list-refresh;%d new feeds", counter))
 }

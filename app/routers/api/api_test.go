@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/yujiahaol68/rossy/app/controller"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/yujiahaol68/rossy/app/controller"
+	"github.com/yujiahaol68/rossy/socket"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/yujiahaol68/rossy/app/model/checkpoint"
@@ -24,7 +26,7 @@ var router = gin.Default()
 
 func setup() error {
 	api.Router(router)
-	//router.Use(cors.Default())
+	socket.Enable = false
 	return database.OpenForTest()
 }
 
