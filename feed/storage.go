@@ -5,19 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/yujiahaol68/rossy/app/entity"
 )
-
-type Post struct {
-	Title    string
-	Link     string
-	Desc     string
-	Content  string
-	Category string
-	PubDate  string
-	Status   string
-}
 
 type Source struct {
 	Category     string `json:"category"`
@@ -31,7 +22,7 @@ type Source struct {
 // Feeder in Cache and used by app
 type Feeder interface {
 	Convert() []*entity.Post
-	Diff(latest *entity.Post, underCondition bool) []*entity.Post
+	Diff(latest time.Time, underCondition bool) []*entity.Post
 }
 
 func SaveAsJSON(newSource []*Source, filePath string) error {

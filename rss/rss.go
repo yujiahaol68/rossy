@@ -17,8 +17,9 @@ type Rss struct {
 	Link        string `xml:"channel>link"`
 	Description string `xml:"channel>description"`
 	// Optional
-	PubDate  string `xml:"channel>pubDate"`
-	ItemList []Item `xml:"channel>item"`
+	PubDate       string `xml:"channel>pubDate"`
+	LastBuildDate string `xml:"channel>lastBuildDate"`
+	ItemList      []Item `xml:"channel>item"`
 }
 
 // Item is a sub struct in Rss
@@ -74,14 +75,17 @@ func (r *Rss) Convert() []*entity.Post {
 	return pl
 }
 
-func (r *Rss) Diff(latest *entity.Post, underCondition bool) []*entity.Post {
+func (r *Rss) Diff(latest time.Time, underCondition bool) []*entity.Post {
 	if underCondition {
 		return r.Convert()
 	}
 	var diffIndex int
+	var curItemPubDate time.Time
 
 	for i, item := range r.ItemList {
-		if item.Link == latest.Link {
+		curItemPubDate, _ = time.Parse("2017-06-23T11:49:32Z", item.PubDate)
+
+		if latest.After(curItemPubDate) {
 			diffIndex = i
 			break
 		}

@@ -50,3 +50,7 @@ func (c CmdController) AddNewSource(tunnel chan *logger.Message, category string
 	wg.Wait()
 	return
 }
+
+func WaitDone() {
+	wg.Done()
+}

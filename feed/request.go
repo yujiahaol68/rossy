@@ -4,12 +4,17 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"regexp"
+	"time"
+
+	"github.com/yujiahaol68/rossy/app/entity"
+	sourceService "github.com/yujiahaol68/rossy/app/service/source"
 
 	"github.com/yujiahaol68/rossy/atom"
 	"github.com/yujiahaol68/rossy/rss"
@@ -124,6 +129,97 @@ func getSourceDesc(rsp *http.Response, url, feedType string) (*Source, error) {
 	}
 }
 
-// func CheckUpdate() {
+func Update(ss []*entity.Source, c chan *[]*entity.Post) {
+	client := http.Client{}
 
-// }
+	for _, s := range ss {
+		wg.Add(1)
+		go func(source *entity.Source) {
+			req, err := http.NewRequest("GET", source.URL, nil)
+			if err != nil {
+				log.Fatalf("newRequest: %v", err)
+				wg.Done()
+				return
+			}
+
+			var hasCondition bool
+			if source.ETag != "" || source.LastModified != "" {
+				hasCondition = true
+				req.Header.Add("If-Modified-Since", source.LastModified)
+				req.Header.Add("If-None-Match", source.ETag)
+			}
+
+			rq, err := client.Do(req)
+			if err != nil {
+				log.Fatalf("client request fail: %v", err)
+				wg.Done()
+				return
+			}
+
+			defer rq.Body.Close()
+			newRawBody, err := ioutil.ReadAll(rq.Body)
+			if err != nil {
+				log.Fatalf("Read body fail: %v", err)
+				wg.Done()
+				return
+			}
+
+			d := xml.NewDecoder(bytes.NewReader(newRawBody))
+			d.CharsetReader = func(s string, reader io.Reader) (io.Reader, error) {
+				return charset.NewReader(reader, s)
+			}
+
+			var pl []*entity.Post
+
+			switch source.Kind {
+			case "rss":
+				r := rss.New()
+				err = d.Decode(r)
+				if err != nil {
+					fmt.Printf("Decode err: %v", err)
+					wg.Done()
+					return
+				}
+				pl = r.Diff(source.Updated, hasCondition)
+
+				// Both PubDate and LastBuildDate are optional
+				latest, err := time.Parse("2017-06-23T11:49:32Z", r.PubDate)
+				if err == nil {
+					sourceService.UpdateDate(source.ID, latest)
+				} else {
+					latest, err = time.Parse("2017-06-23T11:49:32Z", r.LastBuildDate)
+					if err == nil {
+						sourceService.UpdateDate(source.ID, latest)
+					}
+					sourceService.UpdateDate(source.ID, time.Now())
+				}
+
+			case "atom":
+				a := atom.New()
+				err = d.Decode(a)
+				if err != nil {
+					fmt.Printf("Decode err: %v", err)
+					wg.Done()
+					return
+				}
+				pl = a.Diff(source.Updated, hasCondition)
+				// assume the <updated> is provided
+				latest, _ := time.Parse("2017-06-23T11:49:32Z", a.Updated)
+				sourceService.UpdateDate(source.ID, latest)
+			}
+
+			if len(pl) == 0 {
+				wg.Done()
+				return
+			}
+			for _, p := range pl {
+				p.From = source.ID
+			}
+
+			c <- &pl
+		}(s)
+	}
+
+	wg.Wait()
+	close(c)
+}

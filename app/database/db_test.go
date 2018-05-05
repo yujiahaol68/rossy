@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/yujiahaol68/rossy/app/database"
 	"github.com/yujiahaol68/rossy/app/entity"
@@ -69,6 +71,13 @@ func Test_MockDB(t *testing.T) {
 	for i, row := range sourceRows {
 		row.URL = realFeedUrl[i]
 		row.Alias = fmt.Sprintf("%s-%d", row.Alias, i+1)
+		row.Updated = time.Now().AddDate(0, 0, -30)
+		if strings.Contains(realFeedUrl[i], "atom") {
+			row.Kind = "atom"
+		} else {
+			row.Kind = "rss"
+		}
+
 		_, err = database.Conn().Insert(&row)
 		if err != nil {
 			t.Fatal(err)

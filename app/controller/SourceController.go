@@ -2,6 +2,9 @@ package controller
 
 import (
 	"errors"
+	"fmt"
+	"sync/atomic"
+	"time"
 
 	"github.com/yujiahaol68/rossy/app/database"
 
@@ -35,6 +38,7 @@ func (ctrl *SourceController) Add(url string, categoryID int64) (*entity.Source,
 		LastModified: source.LastModified,
 		Alias:        source.Alias,
 		Kind:         source.Type,
+		Updated:      time.Now(),
 	}
 
 	es := sourceService.FindByURL(url)
@@ -44,8 +48,9 @@ func (ctrl *SourceController) Add(url string, categoryID int64) (*entity.Source,
 
 	_, err = database.Conn().InsertOne(s)
 
-	go post.AddNewFeeder(feed.RequestCache[url], s.ID)
-
+	if err == nil {
+		go post.AddNewFeeder(feed.RequestCache[url], s.ID)
+	}
 	return s, err
 }
 
@@ -57,4 +62,24 @@ func (ctrl *SourceController) Unsubscribe(id int64) error {
 
 	go sourceService.Del(es.ID)
 	return postService.DelBySource(es.ID)
+}
+
+func (ctrl *SourceController) UpdateAll() {
+	sl := sourceService.All()
+	var counter int64
+	c := make(chan *[]*entity.Post)
+	go func() {
+		for pl := range c {
+			fmt.Printf("Receiving %d new posts", len(*pl))
+			atomic.AddInt64(&counter, int64(len(*pl)))
+			for _, p := range *pl {
+				database.Conn().InsertOne(p)
+			}
+			feed.WaitDone()
+		}
+	}()
+
+	feed.Update(sl, c)
+	// Send result by websocket
+	fmt.Printf("Rossy Total Update: %d posts", int(counter))
 }

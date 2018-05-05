@@ -78,15 +78,17 @@ func (a *Atom) Convert() []*entity.Post {
 	return pl
 }
 
-func (a *Atom) Diff(latest *entity.Post, underCondition bool) []*entity.Post {
+func (a *Atom) Diff(latest time.Time, underCondition bool) []*entity.Post {
 	if underCondition {
 		return a.Convert()
 	}
 
 	var diffIndex int
+	var curItemPubDate time.Time
 
 	for i, entry := range a.EntryList {
-		if entry.Link.Href == latest.Link {
+		curItemPubDate, _ = time.Parse("2017-06-23T11:49:32Z", entry.Updated)
+		if latest.After(curItemPubDate) {
 			diffIndex = i
 			break
 		}

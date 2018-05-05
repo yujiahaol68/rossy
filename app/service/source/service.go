@@ -1,6 +1,8 @@
 package source
 
 import (
+	"time"
+
 	"github.com/yujiahaol68/rossy/app/database"
 	"github.com/yujiahaol68/rossy/app/entity"
 	"github.com/yujiahaol68/rossy/app/model/endpoint"
@@ -56,4 +58,17 @@ func UnreadList() (*endpoint.UnreadSourceList, error) {
 	}
 
 	return &u, nil
+}
+
+func All() []*entity.Source {
+	db := database.Conn()
+	everySource := make([]*entity.Source, 0)
+	db.Cols("id", "url", "kind", "etag", "last_modified").Find(&everySource)
+	return everySource
+}
+
+func UpdateDate(id int64, latest time.Time) {
+	s := new(entity.Source)
+	s.Updated = latest
+	database.Conn().Id(id).Cols("last_updated").Update(s)
 }

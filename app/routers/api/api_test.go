@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/yujiahaol68/rossy/app/controller"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -126,4 +127,8 @@ func Test_post(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	fmt.Println(w.Body.String())
+}
+
+func Test_updateFeed(t *testing.T) {
+	controller.Source.UpdateAll()
 }
