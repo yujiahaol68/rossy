@@ -93,12 +93,14 @@ func Test_category(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+	t.Log(w.Body.String())
 
-	t.Log("GET: /api/categories/:id?name=xxx")
+	t.Log("PUT: /api/categories/:id?name=xxx")
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("PUT", "/api/categories/1?name=abcd", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
+	t.Log(w.Body.String())
 
 	t.Log("POST: /api/categories")
 	checkNew := checkpoint.PostCategory{"DS520"}
@@ -106,29 +108,30 @@ func Test_category(t *testing.T) {
 	req = makeJSONReq("POST", "/api/categories/", &checkNew)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
+	t.Log(w.Body.String())
 }
 
 func Test_post(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/post/?offset=1&limit=5", nil)
-	req.Header.Set("Accept", "application/json")
+	req := makeJSONReq("GET", "/api/post/?offset=1&limit=10", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	fmt.Println(w.Body.String())
+	t.Log("GET: /api/post/")
+	t.Log(w.Body.String())
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/api/post/unread?offset=1&limit=4", nil)
-	req.Header.Set("Accept", "application/json")
+	req = makeJSONReq("GET", "/api/post/unread?offset=1&limit=4", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	fmt.Println(w.Body.String())
+	t.Log("GET: /api/post/unread")
+	t.Log(w.Body.String())
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/api/post/source/1?offset=1&limit=4", nil)
-	req.Header.Set("Accept", "application/json")
+	req = makeJSONReq("GET", "/api/post/source/2?offset=1&limit=4", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	fmt.Println(w.Body.String())
+	t.Log("GET: /api/post/source/:id")
+	t.Log(w.Body.String())
 }
 
 func Test_updateFeed(t *testing.T) {

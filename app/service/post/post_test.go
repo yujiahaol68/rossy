@@ -26,9 +26,32 @@ func TestMain(m *testing.M) {
 }
 
 func Test_readList(t *testing.T) {
-	_, err := post.List(1, 4)
+	li, err := post.List(20, 0)
 	if err != nil {
 		t.Fatal(err)
+	}
+	for i, p := range li {
+		t.Logf("\n%d: %s", i, p.Title)
+	}
+}
+
+func Test_unreadList(t *testing.T) {
+	li, err := post.UnreadList(20, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, p := range li {
+		t.Logf("\n%d: %s", i, p.Title)
+	}
+}
+
+func Test_sourceList(t *testing.T) {
+	li, err := post.SourceList(2, 10, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, p := range li {
+		t.Logf("\n%d: %s", i, p.Title)
 	}
 }
 

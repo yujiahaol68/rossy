@@ -71,5 +71,5 @@ func GetSourcePostList(c *gin.Context) {
 		return
 	}
 
-	ResultOk(c, spl)
+	ResultList(c, spl, int64(len(spl)))
 }
