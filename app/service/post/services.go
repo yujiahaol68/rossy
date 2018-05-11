@@ -52,3 +52,8 @@ func DelBySource(source int64) error {
 	_, err := db.Where("post.source_id = ?", source).Delete(&entity.Post{})
 	return err
 }
+
+func MarkRead(id int64) error {
+	_, err := database.Conn().Table(new(entity.Post)).ID(id).Update(map[string]interface{}{"unread": false})
+	return err
+}

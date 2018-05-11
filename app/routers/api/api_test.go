@@ -10,6 +10,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/yujiahaol68/rossy/app/entity"
+
 	"github.com/yujiahaol68/rossy/app/controller"
 	"github.com/yujiahaol68/rossy/socket"
 
@@ -132,6 +134,17 @@ func Test_post(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	t.Log("GET: /api/post/source/:id")
 	t.Log(w.Body.String())
+
+	w = httptest.NewRecorder()
+	req = makeJSONReq("PUT", "/api/post/1", nil)
+	router.ServeHTTP(w, req)
+	t.Log(w.Body.String())
+	assert.Equal(t, http.StatusOK, w.Code)
+	p := new(entity.Post)
+	database.Conn().Id(1).Get(p)
+	if p.Unread {
+		t.Fatalf("Expect post.Unread is false, But got %v", p.Unread)
+	}
 }
 
 func Test_updateFeed(t *testing.T) {

@@ -27,6 +27,7 @@ func Router(router *gin.Engine) {
 	{
 		post := apiRouter.Group("post")
 		post.GET("/", handlers.GetPostList)
+		post.PUT("/:id", handlers.MarkPost)
 		post.GET("/unread", handlers.GetUnreadPostList)
 		post.GET("/source/:id", handlers.GetSourcePostList)
 	}

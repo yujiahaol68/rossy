@@ -67,6 +67,10 @@ func (ctrl *SourceController) Unsubscribe(id int64) error {
 
 func (ctrl *SourceController) UpdateAll() {
 	sl := sourceService.All()
+	if len(sl) == 0 {
+		return
+	}
+
 	var counter int64
 	c := make(chan *[]*entity.Post)
 	go func() {
@@ -81,5 +85,5 @@ func (ctrl *SourceController) UpdateAll() {
 	}()
 
 	feed.Update(sl, c)
-	socket.Notices.Push(fmt.Sprintf("post-list-refresh;%d new feeds", counter))
+	socket.Notices.Push(fmt.Sprintf("feed-list-refresh;success;Update %d new feeds", counter))
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -72,4 +73,23 @@ func GetSourcePostList(c *gin.Context) {
 	}
 
 	ResultList(c, spl, int64(len(spl)))
+}
+
+func MarkPost(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		ResultFail(c, http.StatusBadRequest, errors.New("invalid ID"))
+		c.Abort()
+		return
+	}
+
+	err = post.MarkRead(id)
+	if err != nil {
+		log.Fatal(err)
+		ResultFail(c, http.StatusBadRequest, err)
+		c.Abort()
+		return
+	}
+
+	ResultOk(c, nil)
 }

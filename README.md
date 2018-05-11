@@ -8,7 +8,7 @@ _self-host RSS web reader in Golang_
 
 ## Description
 
-`rossy` provides out of box full feature RSS Reader API powered by [gin](https://github.com/gin-gonic/gin) and SQLITE. You can self-host rossy reader in your local env. Just by running released binary can give you exactly the same function like other online RSS reader. But your can always keep your data in local.
+`rossy` provides out of box full feature RSS Reader API powered by [gin](https://github.com/gin-gonic/gin) and SQLITE. You can self-host rossy reader in your local env. Just by running released binary can give you exactly the same function like other online RSS reader. But you can also keep your data in local.
 
 ## Feature
 
