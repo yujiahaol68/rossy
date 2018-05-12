@@ -11,7 +11,14 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
+
+	"golang.org/x/text/encoding/korean"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 
 	"github.com/yujiahaol68/rossy/app/entity"
 	sourceService "github.com/yujiahaol68/rossy/app/service/source"
@@ -56,12 +63,48 @@ func sourceType(header string) string {
 	return sourceReg.FindString(header)
 }
 
+func detectCharset(headerVal string) string {
+	pairs := strings.Split(headerVal, ";")
+	defaultCharset := "utf-8"
+
+	for _, pair := range pairs {
+		kv := strings.Split(pair, "=")
+		if len(kv) != 2 {
+			continue
+		}
+		if strings.Contains(kv[0], "charset") {
+			return strings.ToLower(strings.TrimSpace(kv[1]))
+		}
+	}
+
+	return defaultCharset
+}
+
+func decodeReader(rsp *http.Response) io.Reader {
+	switch detectCharset(rsp.Header.Get("content-type")) {
+	case "gb2312":
+		fallthrough
+	case "gbk":
+		return transform.NewReader(rsp.Body, simplifiedchinese.GBK.NewDecoder())
+	case "shift_jis":
+		return transform.NewReader(rsp.Body, japanese.ShiftJIS.NewDecoder())
+	case "euc-jp":
+		return transform.NewReader(rsp.Body, japanese.EUCJP.NewDecoder())
+	case "euc-kr":
+		return transform.NewReader(rsp.Body, korean.EUCKR.NewDecoder())
+	default:
+		return rsp.Body
+	}
+}
+
 func getSourceDesc(rsp *http.Response, url, feedType string) (*Source, error) {
-	bodyContent, err := ioutil.ReadAll(rsp.Body)
+	r := decodeReader(rsp)
+	defer rsp.Body.Close()
+
+	bodyContent, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, CmdErrXMLParse
 	}
-	defer rsp.Body.Close()
 
 	d := xml.NewDecoder(bytes.NewReader(bodyContent))
 	d.CharsetReader = func(s string, reader io.Reader) (io.Reader, error) {
@@ -156,8 +199,10 @@ func Update(ss []*entity.Source, c chan *[]*entity.Post) {
 				return
 			}
 
+			r := decodeReader(rq)
 			defer rq.Body.Close()
-			newRawBody, err := ioutil.ReadAll(rq.Body)
+
+			newRawBody, err := ioutil.ReadAll(r)
 			if err != nil {
 				log.Fatalf("Read body fail: %v", err)
 				wg.Done()
@@ -183,12 +228,14 @@ func Update(ss []*entity.Source, c chan *[]*entity.Post) {
 				pl = r.Diff(source.Updated, hasCondition)
 
 				// Both PubDate and LastBuildDate are optional
-				latest, err := time.Parse("2017-06-23T11:49:32Z", r.PubDate)
+				latest, err := time.Parse(time.RFC822, r.PubDate)
 				if err == nil {
+					latest, _ = time.Parse(time.RFC3339, latest.Format(time.RFC3339))
 					sourceService.UpdateDate(source.ID, latest)
 				} else {
-					latest, err = time.Parse("2017-06-23T11:49:32Z", r.LastBuildDate)
+					latest, err = time.Parse(time.RFC822, r.LastBuildDate)
 					if err == nil {
+						latest, _ = time.Parse(time.RFC3339, latest.Format(time.RFC3339))
 						sourceService.UpdateDate(source.ID, latest)
 					}
 					sourceService.UpdateDate(source.ID, time.Now())
@@ -204,7 +251,7 @@ func Update(ss []*entity.Source, c chan *[]*entity.Post) {
 				}
 				pl = a.Diff(source.Updated, hasCondition)
 				// assume the <updated> is provided
-				latest, _ := time.Parse("2017-06-23T11:49:32Z", a.Updated)
+				latest, _ := time.Parse(time.RFC3339, a.Updated)
 				sourceService.UpdateDate(source.ID, latest)
 			}
 

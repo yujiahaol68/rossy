@@ -5,10 +5,16 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"testing"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
 
 	"github.com/yujiahaol68/rossy/rss"
 	"golang.org/x/net/html/charset"
+	"golang.org/x/text/transform"
 )
 
 const (
@@ -114,5 +120,27 @@ func Test_notUTF8(t *testing.T) {
 
 	for _, item := range r.ItemList {
 		fmt.Printf("* %s\n%s\n", item.Title, item.Link)
+	}
+}
+
+func Test_GB2312charset(t *testing.T) {
+	rsp, err := http.Get("http://tech.qq.com/web/rss_web.xml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rsp.Body.Close()
+	rInUTF8 := transform.NewReader(rsp.Body, simplifiedchinese.GBK.NewDecoder())
+
+	b, _ := ioutil.ReadAll(rInUTF8)
+
+	d := xml.NewDecoder(bytes.NewReader(b))
+	d.CharsetReader = func(s string, reader io.Reader) (io.Reader, error) {
+		return charset.NewReader(reader, s)
+	}
+
+	r := rss.New()
+	d.Decode(r)
+	for _, item := range r.ItemList {
+		fmt.Println(item.Description)
 	}
 }

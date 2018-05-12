@@ -49,10 +49,11 @@ func (r *Rss) Convert() []*entity.Post {
 	pl := make([]*entity.Post, len(r.ItemList))
 
 	for i, item := range r.ItemList {
-		t, err := time.Parse("2017-06-23T11:49:32Z", item.PubDate)
+		t, err := time.Parse(time.RFC822, item.PubDate)
 		if err != nil {
 			t = time.Now()
 		}
+		t, _ = time.Parse(time.RFC3339, t.Format(time.RFC3339))
 
 		p := new(entity.Post)
 		p.Unread = true
@@ -83,7 +84,7 @@ func (r *Rss) Diff(latest time.Time, underCondition bool) []*entity.Post {
 	var curItemPubDate time.Time
 
 	for i, item := range r.ItemList {
-		curItemPubDate, _ = time.Parse("2017-06-23T11:49:32Z", item.PubDate)
+		curItemPubDate, _ = time.Parse(time.RFC822, item.PubDate)
 
 		if latest.After(curItemPubDate) {
 			diffIndex = i

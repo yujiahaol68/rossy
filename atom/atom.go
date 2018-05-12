@@ -52,7 +52,7 @@ func (a *Atom) Convert() []*entity.Post {
 	pl := make([]*entity.Post, len(a.EntryList))
 
 	for i, entry := range a.EntryList {
-		t, err := time.Parse("2017-06-23T11:49:32Z", entry.Updated)
+		t, err := time.Parse(time.RFC3339, entry.Updated)
 		if err != nil {
 			t = time.Now()
 		}
@@ -87,7 +87,7 @@ func (a *Atom) Diff(latest time.Time, underCondition bool) []*entity.Post {
 	var curItemPubDate time.Time
 
 	for i, entry := range a.EntryList {
-		curItemPubDate, _ = time.Parse("2017-06-23T11:49:32Z", entry.Updated)
+		curItemPubDate, _ = time.Parse(time.RFC3339, entry.Updated)
 		if latest.After(curItemPubDate) {
 			diffIndex = i
 			break

@@ -3,6 +3,7 @@ package feed
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"testing"
 )
@@ -108,6 +109,15 @@ func Test_notUTF8(t *testing.T) {
 	fmt.Println(s.Alias)
 }
 
-func Test_lookup(t *testing.T) {
+func Test_charsetDetector(t *testing.T) {
+	rsp, err := http.Get("http://tech.qq.com/web/rss_web.xml")
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	charset := detectCharset(rsp.Header.Get("content-type"))
+
+	if charset != "gb2312" {
+		t.Fatalf("expect detect gb2312 charset, but got %s", charset)
+	}
 }
