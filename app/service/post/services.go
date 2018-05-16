@@ -15,7 +15,7 @@ func List(limit, offset int) ([]*entity.Post, error) {
 	db := database.Conn()
 
 	rl := make([]*entity.Post, 0)
-	err := db.Cols("id", "desc", "source_id", "title", "link", "author").Desc("create_at").Limit(limit, offset).Find(&rl)
+	err := db.Cols("id", "desc", "source_id", "title", "link", "author", "create_at").Desc("create_at").Limit(limit, offset).Find(&rl)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func UnreadList(limit, offset int) ([]*entity.Post, error) {
 	db := database.Conn()
 
 	unread := make([]*entity.Post, 0)
-	err := db.Cols("id", "desc", "source_id", "title", "link", "author").Where("post.unread = 1").Desc("create_at").Limit(limit, offset).Find(&unread)
+	err := db.Cols("id", "desc", "source_id", "title", "link", "author", "create_at").Where("post.unread = 1").Desc("create_at").Limit(limit, offset).Find(&unread)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func SourceList(sourceID int64, limit, offset int) ([]*entity.Post, error) {
 	db := database.Conn()
 
 	srl := make([]*entity.Post, 0)
-	err := db.Cols("id", "desc", "source_id", "title", "link", "author").Where("post.source_id = ?", sourceID).Desc("create_at").Limit(limit, offset).Find(&srl)
+	err := db.Cols("id", "desc", "source_id", "title", "link", "author", "create_at").Where("post.source_id = ?", sourceID).Desc("create_at").Limit(limit, offset).Find(&srl)
 	if err != nil {
 		return nil, err
 	}

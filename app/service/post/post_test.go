@@ -31,7 +31,7 @@ func Test_readList(t *testing.T) {
 		t.Fatal(err)
 	}
 	for i, p := range li {
-		t.Logf("\n%d: %s", i, p.Title)
+		t.Logf("\n%d: %s, %s\n", i, p.Title, p.CreateAt)
 	}
 }
 
