@@ -37,3 +37,8 @@ type Category struct {
 	Created time.Time `xorm:"created"`
 	Updated time.Time `xorm:"updated"`
 }
+
+type Crawler interface {
+	ParseURL(url string)
+	FullEssay() []byte
+}

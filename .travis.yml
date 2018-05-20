@@ -31,10 +31,10 @@ script:
 - go test github.com/yujiahaol68/rossy/app/database
 - rm -f ./app/database/db_test.go
 - $GOPATH/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
-- go build main.go
+- go build -ldflags "-X checkpoint.Key=${MERCURY_API_TOKEN}" main.go
 
 before_deploy:
-- gox -tags="jsoniter" -os="linux darwin windows" -arch="amd64" -output="rossy_{{.OS}}_{{.Arch}}" -verbose ./...
+- gox -tags="jsoniter" -ldflags="-X checkpoint.Key=${MERCURY_API_TOKEN}" -os="linux darwin windows" -arch="amd64" -output="rossy_{{.OS}}_{{.Arch}}" -verbose ./...
 - du -sh * | grep -e "darwin" -e "linux" -e "windows"
 
 deploy:
