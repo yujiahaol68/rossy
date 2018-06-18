@@ -39,6 +39,6 @@ type Category struct {
 }
 
 type Crawler interface {
-	ParseURL(url string)
-	FullEssay() []byte
+	ParseURL(url string) error
+	Bytes() ([]byte, error)
 }

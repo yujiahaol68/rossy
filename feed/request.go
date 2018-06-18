@@ -22,6 +22,7 @@ import (
 
 	"github.com/yujiahaol68/rossy/app/entity"
 	sourceService "github.com/yujiahaol68/rossy/app/service/source"
+	"github.com/yujiahaol68/rossy/feed/httpclient"
 
 	"github.com/yujiahaol68/rossy/atom"
 	"github.com/yujiahaol68/rossy/rss"
@@ -45,7 +46,7 @@ var (
 )
 
 func GetSourceByURL(url string) (*Source, error) {
-	resp, err := http.Get(url)
+	resp, err := httpclient.New().Get(url)
 	if err != nil {
 		if err, ok := err.(net.Error); ok && err.Timeout() {
 			return nil, ErrUserNetwork
@@ -173,7 +174,7 @@ func getSourceDesc(rsp *http.Response, url, feedType string) (*Source, error) {
 }
 
 func Update(ss []*entity.Source, c chan *[]*entity.Post) {
-	client := http.Client{}
+	client := httpclient.New()
 
 	for _, s := range ss {
 		wg.Add(1)

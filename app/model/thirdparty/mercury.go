@@ -1,7 +1,14 @@
-package checkpoint
+package thirdparty
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"sync"
 	"time"
+
+	"github.com/yujiahaol68/rossy/feed/httpclient"
 
 	"github.com/yujiahaol68/rossy/app/entity"
 )
@@ -9,6 +16,8 @@ import (
 var (
 	ParserURL = "https://mercury.postlight.com/parser?url=%s"
 	Key       string
+	once      sync.Once
+	crawler   entity.Crawler
 )
 
 var _ entity.Crawler = new(mercury)
@@ -30,13 +39,35 @@ type mercury struct {
 }
 
 func NewParser() entity.Crawler {
-	return new(mercury)
+	once.Do(func() {
+		crawler = new(mercury)
+	})
+	return crawler
 }
 
-func (m *mercury) ParseURL(u string) {
+func (m *mercury) ParseURL(u string) error {
+	client := httpclient.New()
 
+	req, err := http.NewRequest("GET", fmt.Sprintf(ParserURL, u), nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("x-api-key", Key)
+	rsp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer rsp.Body.Close()
+	body, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(body, m)
 }
 
-func (m *mercury) FullEssay() []byte {
-	return []byte{}
+func (m *mercury) Bytes() ([]byte, error) {
+	return json.Marshal(m)
 }
