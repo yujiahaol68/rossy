@@ -30,6 +30,7 @@ func Router(router *gin.Engine) {
 		post.PUT("/:id", handlers.MarkPost)
 		post.GET("/unread", handlers.GetUnreadPostList)
 		post.GET("/source/:id", handlers.GetSourcePostList)
+		post.GET("/full", handlers.ParseFullPost)
 	}
 
 	{

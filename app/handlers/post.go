@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yujiahaol68/rossy/app/model/checkpoint"
+	"github.com/yujiahaol68/rossy/app/model/thirdparty"
 )
 
 func GetPostList(c *gin.Context) {
@@ -92,4 +93,30 @@ func MarkPost(c *gin.Context) {
 	}
 
 	ResultOk(c, nil)
+}
+
+func ParseFullPost(c *gin.Context) {
+	u := c.Query("url")
+	if u == "" {
+		ResultOk(c, nil)
+		c.Abort()
+		return
+	}
+
+	p := thirdparty.NewParser()
+	err := p.ParseURL(u)
+	if err != nil {
+		ResultFail(c, http.StatusInternalServerError, errors.New("parse URL Failed"))
+		c.Abort()
+		return
+	}
+
+	bs, err := p.Bytes()
+	if err != nil {
+		ResultFail(c, http.StatusInternalServerError, errors.New("parse text Failed"))
+		c.Abort()
+		return
+	}
+
+	c.Data(200, "application/json; charset=utf-8", bs)
 }

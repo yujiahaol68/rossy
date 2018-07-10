@@ -10,6 +10,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/yujiahaol68/rossy/app/model/thirdparty"
+
 	"github.com/yujiahaol68/rossy/app/entity"
 
 	"github.com/yujiahaol68/rossy/app/controller"
@@ -144,6 +146,15 @@ func Test_post(t *testing.T) {
 	database.Conn().Id(1).Get(p)
 	if p.Unread {
 		t.Fatalf("Expect post.Unread is false, But got %v", p.Unread)
+	}
+
+	thirdparty.Key = os.Getenv("MERCURY_API_TOKEN")
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/api/post/full?url=https://www.bbc.com/news/world-asia-44772783", nil)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	if w.Body.Len() == 0 {
+		t.Fatalf("Expect has body but got nothing")
 	}
 }
 
